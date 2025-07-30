@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Withdraw - CashPrint</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0fdf4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #007b55;
+    }
+
+    p {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color: #007b55;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #cce0cc;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    button {
+      background: #007b55;
+      color: white;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .withdrawals-list {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .withdrawals-list h3 {
+      margin-bottom: 15px;
+      font-size: 18px;
+      color: #1a1a1a;
+    }
+
+    .withdraw-item {
+      background: #e6f5ea;
+      padding: 10px 15px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .withdraw-item span {
+      display: block;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      font-weight: bold;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Withdraw</h2>
+<p><strong>Note: No withdrawal charges</strong></p>
+
+<form id="withdrawForm">
+  <input type="text" id="phone" placeholder="Receiving Phone" required />
+  <input type="text" id="name" placeholder="Holder's Name" required />
+  <input type="number" id="amount" placeholder="Amount to Withdraw (UGX)" required />
+  <button type="submit">Submit Withdrawal</button>
+</form>
+
+<p class="error" id="error"></p>
+
+<div class="withdrawals-list">
+  <h3>Recent Paid Withdrawals</h3>
+  <div id="withdrawalsContainer"></div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
+    authDomain: "cashprint-c5e72.firebaseapp.com",
+    projectId: "cashprint-c5e72",
+    storageBucket: "cashprint-c5e72.appspot.com",
+    messagingSenderId: "613734624925",
+    appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let currentUser;
+
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      currentUser = user;
+      loadPaidWithdrawals();
+    } else {
+      window.location.href = "login.html";
+    }
+  });
+
+  document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const phone = document.getElementById("phone").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const amount = parseInt(document.getElementById("amount").value);
+    const errorDiv = document.getElementById("error");
+    errorDiv.textContent = "";
+
+    if (amount < 5000) {
+      return errorDiv.textContent = "Minimum withdrawal is 5,000 UGX.";
+    }
+
+    const userRef = db.collection("users").doc(currentUser.uid);
+    const userSnap = await userRef.get();
+    const userData = userSnap.data();
+
+    if (!userData || !userData.accountBalance || userData.accountBalance < amount) {
+      return errorDiv.textContent = "Insufficient account balance.";
+    }
+
+    const earningsSnap = await db.collection("earnings").where("userId", "==", currentUser.uid).get();
+    if (earningsSnap.empty) {
+      return errorDiv.textContent = "Please deposit and invest to activate withdrawals.";
+    }
+
+    await db.collection("withdrawals").add({
+      phone,
+      name,
+      amount,
+      userId: currentUser.uid,
+      status: "pending",
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    await userRef.update({
+      accountBalance: firebase.firestore.FieldValue.increment(-amount)
+    });
+
+    alert("Withdrawal request submitted.");
+    document.getElementById("withdrawForm").reset();
+  });
+
+  async function loadPaidWithdrawals() {
+    const container = document.getElementById("withdrawalsContainer");
+    const snapshot = await db.collection("withdrawals").where("status", "==", "paid").get();
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const item = document.createElement("div");
+      item.className = "withdraw-item";
+      item.innerHTML = `
+        <span><strong>Phone:</strong> ${data.phone}</span>
+        <span><strong>Amount:</strong> UGX ${data.amount}</span>
+        <span><strong>Status:</strong> Paid</span>
+      `;
+      container.appendChild(item);
+    });
+  }
+</script>
+
+</body>
+</html>
