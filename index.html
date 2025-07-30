@@ -9,418 +9,391 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --primary: #d35400;
-      --primary-dark: #b03e00;
-      --secondary: #3498db;
-      --light: #f8f9fa;
-      --dark: #2c3e50;
-      --success: #27ae60;
-      --danger: #e74c3c;
-      --gray: #7f8c8d;
-      --light-gray: #ecf0f1;
-      --border-radius: 12px;
-      --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-      color: var(--dark);
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 0;
-      margin-bottom: 30px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .logo h1 {
-      font-size: 28px;
-      font-weight: 800;
-    }
-    
-    .logo span:first-child {
-      color: var(--primary);
-    }
-    
-    .logo span:last-child {
-      color: var(--secondary);
-    }
-    
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    
-    .user-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 20px;
-    }
-    
-    .user-details {
-      text-align: right;
-    }
-    
-    .user-name {
-      font-weight: 600;
-      font-size: 18px;
-    }
-    
-    .logout-btn {
-      background: none;
-      border: none;
-      color: var(--gray);
-      cursor: pointer;
-      font-size: 14px;
-      padding: 5px;
-    }
-    
-    .logout-btn:hover {
-      color: var(--primary);
-    }
-    
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 25px;
-      margin-bottom: 40px;
-    }
-    
-    .card {
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      padding: 25px;
-      transition: transform 0.3s;
-    }
-    
-    .card:hover {
-      transform: translateY(-5px);
-    }
-    
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    
-    .card-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--gray);
-    }
-    
-    .card-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-    }
-    
-    .balance-card .card-icon {
-      background: rgba(52, 152, 219, 0.1);
-      color: var(--secondary);
-    }
-    
-    .withdrawn-card .card-icon {
-      background: rgba(231, 76, 60, 0.1);
-      color: var(--danger);
-    }
-    
-    .card-value {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--dark);
-      margin-bottom: 10px;
-    }
-    
-    .card-subtext {
-      color: var(--gray);
-      font-size: 14px;
-    }
-    
-    .action-buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-bottom: 40px;
-    }
-    
-    .action-btn {
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      border: none;
-    }
-    
-    .action-btn:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .action-btn i {
-      font-size: 32px;
-      margin-bottom: 15px;
-    }
-    
-    .deposit-btn {
-      color: var(--success);
-      background: rgba(39, 174, 96, 0.1);
-    }
-    
-    .withdraw-btn {
-      color: var(--danger);
-      background: rgba(231, 76, 60, 0.1);
-    }
-    
-    .invest-btn {
-      color: var(--secondary);
-      background: rgba(52, 152, 219, 0.1);
-    }
-    
-    .btn-label {
-      font-weight: 600;
-      font-size: 18px;
-    }
-    
-    .referral-section {
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      padding: 25px;
-      margin-bottom: 40px;
-    }
-    
-    .section-title {
-      font-size: 22px;
-      margin-bottom: 20px;
-      color: var(--dark);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .section-title i {
-      color: var(--primary);
-    }
-    
-    .referral-container {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-    
-    .referral-link {
-      flex: 1;
-      min-width: 300px;
-      background: var(--light-gray);
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 16px;
-      border: 1px dashed var(--gray);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .copy-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s;
-    }
-    
-    .copy-btn:hover {
-      background: var(--primary-dark);
-    }
-    
-    .referral-note {
-      background: rgba(52, 152, 219, 0.1);
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 14px;
-      color: var(--dark);
-      flex: 1;
-      min-width: 300px;
-    }
-    
-    .referral-note strong {
-      color: var(--success);
-    }
-    
-    .investment-plans {
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      padding: 25px;
-      margin-bottom: 40px;
-    }
-    
-    .table-container {
-      overflow-x: auto;
-    }
-    
-    .investment-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    
-    .investment-table th,
-    .investment-table td {
-      padding: 15px;
-      text-align: center;
-      border-bottom: 1px solid var(--light-gray);
-    }
-    
-    .investment-table th {
-      background: var(--light-gray);
-      font-weight: 600;
-    }
-    
-    .investment-table tbody tr:hover {
-      background: rgba(52, 152, 219, 0.05);
-    }
-    
-    .investment-table .highlight {
-      background: rgba(39, 174, 96, 0.1);
-      font-weight: 600;
-    }
-    
-    .referrals-section {
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      padding: 25px;
-    }
-    
-    .referral-list {
-      margin-top: 20px;
-    }
-    
-    .referral-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 15px;
-      border-bottom: 1px solid var(--light-gray);
-    }
-    
-    .referral-item:last-child {
-      border-bottom: none;
-    }
-    
-    .referral-name {
-      font-weight: 600;
-    }
-    
-    .referral-bonus {
-      color: var(--success);
-      font-weight: 600;
-    }
-    
-    .no-referrals {
-      text-align: center;
-      padding: 30px;
-      color: var(--gray);
-    }
-    
-    .loading {
-      text-align: center;
-      padding: 30px;
-      color: var(--gray);
-    }
-    
-    .loading i {
-      font-size: 24px;
-      margin-bottom: 15px;
-      display: block;
-    }
-    
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--success);
-      color: white;
-      padding: 15px 25px;
-      border-radius: 8px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      transform: translateX(200%);
-      transition: transform 0.3s;
-      z-index: 1000;
-    }
-    
-    .toast.show {
-      transform: translateX(0);
-    }
-    
-    @media (max-width: 768px) {
-      .action-buttons {
-        grid-template-columns: 1fr;
-      }
-      
-      .referral-container {
-        flex-direction: column;
-      }
-      
-      .referral-link,
-      .referral-note {
-        min-width: 100%;
-      }
-    }
+  :root {
+  --primary: #d35400;
+  --primary-dark: #b03e00;
+  --secondary: #3498db;
+  --success: #27ae60;
+  --danger: #e74c3c;
+  --dark: #2c3e50;
+  --gray: #7f8c8d;
+  --light-gray: #ecf0f1;
+  --border-radius: 12px;
+  --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+  color: var(--dark);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 0;
+  margin-bottom: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo h1 {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.logo span:first-child {
+  color: var(--primary);
+}
+
+.logo span:last-child {
+  color: var(--secondary);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 5px;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: var(--gray);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px;
+}
+
+.logout-btn:hover {
+  color: var(--primary);
+}
+
+/* Summary cards */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray);
+  margin-bottom: 10px;
+}
+
+.summary-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 5px;
+}
+
+.summary-subtext {
+  color: var(--gray);
+  font-size: 13px;
+  margin-top: auto;
+}
+
+/* Action buttons in one row */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 10px 5px;
+  font-size: 12px;
+  background: white;
+  border: none;
+  border-radius: 8px;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.action-btn:hover {
+  transform: scale(1.02);
+}
+
+.action-btn i {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.btn-label {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.deposit-btn {
+  color: var(--success);
+  background: rgba(39, 174, 96, 0.1);
+}
+
+.withdraw-btn {
+  color: var(--danger);
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.invest-btn {
+  color: var(--secondary);
+  background: rgba(52, 152, 219, 0.1);
+}
+/* Referral section */
+.referral-section {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title i {
+  color: var(--primary);
+}
+
+.referral-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.referral-link {
+  flex: 1;
+  min-width: 300px;
+  background: var(--light-gray);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 15px;
+  border: 1px dashed var(--gray);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.copy-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+  font-size: 14px;
+}
+
+.copy-btn:hover {
+  background: var(--primary-dark);
+}
+
+.referral-note {
+  background: rgba(52, 152, 219, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--dark);
+  flex: 1;
+  min-width: 300px;
+}
+
+.referral-note strong {
+  color: var(--success);
+}
+
+/* Investment plans */
+.investment-plans {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.investment-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.investment-table th,
+.investment-table td {
+  padding: 12px 10px;
+  text-align: center;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.investment-table th {
+  background: var(--light-gray);
+  font-weight: 600;
+}
+
+.investment-table tbody tr:hover {
+  background: rgba(52, 152, 219, 0.05);
+}
+
+.investment-table .highlight {
+  background: rgba(39, 174, 96, 0.1);
+  font-weight: 600;
+}
+
+/* Referrals list */
+.referrals-section {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+}
+
+.referral-list {
+  margin-top: 15px;
+}
+
+.referral-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.referral-item:last-child {
+  border-bottom: none;
+}
+
+.referral-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.referral-date {
+  font-size: 13px;
+  color: var(--gray);
+}
+
+.referral-bonus {
+  color: var(--success);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.no-referrals {
+  text-align: center;
+  padding: 20px;
+  color: var(--gray);
+  font-size: 15px;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--gray);
+}
+
+.loading i {
+  font-size: 24px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--success);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateX(200%);
+  transition: transform 0.3s;
+  z-index: 1000;
+  font-size: 14px;
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+/* Responsive tweaks without breaking row layout */
+@media (max-width: 768px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .referral-container {
+    flex-direction: column;
+  }
+
+  .referral-link,
+  .referral-note {
+    min-width: 100%;
+  }
+
+  .investment-table {
+    font-size: 13px;
+  }
+}
   </style>
 </head>
-
 
 <body>
   <div class="container">
@@ -430,33 +403,28 @@
       </div>
       <div class="user-info">
         <div class="user-details">
-          <div class="user-name" id="userName">John Doe</div>
+          <div class="user-name" id="userName">Loading...</div>
           <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
-        <div class="user-avatar" id="userAvatar">JD</div>
       </div>
     </header>
     
-    <div class="dashboard-grid">
-      <div class="card balance-card">
-        <div class="card-header">
-          <div class="card-title">Account Balance</div>
-          <div class="card-icon"><i class="fas fa-wallet"></i></div>
-        </div>
-        <div class="card-value" id="accountBalance">0 UGX</div>
-        <div class="card-subtext">Available for withdrawal or investment</div>
+    <!-- Compact summary section -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-title">Account Balance</div>
+        <div class="summary-value" id="accountBalance">0 UGX</div>
+        <div class="summary-subtext">Available for withdrawal or investment</div>
       </div>
       
-      <div class="card withdrawn-card">
-        <div class="card-header">
-          <div class="card-title">Total Withdrawn</div>
-          <div class="card-icon"><i class="fas fa-money-bill-wave"></i></div>
-        </div>
-        <div class="card-value" id="totalWithdrawn">0 UGX</div>
-        <div class="card-subtext">Amount successfully paid to you</div>
+      <div class="summary-card">
+        <div class="summary-title">Total Withdrawn</div>
+        <div class="summary-value" id="totalWithdrawn">0 UGX</div>
+        <div class="summary-subtext">Amount successfully paid to you</div>
       </div>
     </div>
     
+    <!-- Action buttons -->
     <div class="action-buttons">
       <button class="action-btn deposit-btn" id="depositBtn">
         <i class="fas fa-plus-circle"></i>
@@ -474,20 +442,21 @@
       </button>
     </div>
     
+    <!-- Referral section -->
     <div class="referral-section">
       <h2 class="section-title"><i class="fas fa-share-alt"></i> Your Referral Link</h2>
       <div class="referral-container">
         <div class="referral-link" id="referralLink">
-          <span id="linkText">https://cashprint.app/signup.html?ref=+256781234567</span>
+          <span id="linkText">Generating link...</span>
           <button class="copy-btn" id="copyBtn">Copy</button>
         </div>
         <div class="referral-note">
-          <strong>Earn 1000 UGX</strong> for every friend who signs up using your referral link. 
-          Share this link to grow your earnings!
+          <strong>Earn 20%</strong> of your referral's first investment! Share this link to grow your earnings.
         </div>
       </div>
     </div>
     
+    <!-- Investment plans -->
     <div class="investment-plans">
       <h2 class="section-title"><i class="fas fa-coins"></i> Investment Plans</h2>
       <div class="table-container">
@@ -507,6 +476,7 @@
       </div>
     </div>
     
+    <!-- Referrals list -->
     <div class="referrals-section">
       <h2 class="section-title"><i class="fas fa-users"></i> Your Referrals</h2>
       <div class="referral-list" id="referralList">
@@ -520,6 +490,7 @@
   
   <div class="toast" id="toast">Link copied to clipboard!</div>
   
+
   <script>
     // Firebase configuration
     const firebaseConfig = {
@@ -541,7 +512,6 @@
     const accountBalanceEl = document.getElementById('accountBalance');
     const totalWithdrawnEl = document.getElementById('totalWithdrawn');
     const userNameEl = document.getElementById('userName');
-    const userAvatarEl = document.getElementById('userAvatar');
     const logoutBtn = document.getElementById('logoutBtn');
     const depositBtn = document.getElementById('depositBtn');
     const withdrawBtn = document.getElementById('withdrawBtn');
@@ -560,11 +530,6 @@
     auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = user;
-        // Get user initials for avatar
-        const nameParts = user.displayName ? user.displayName.split(' ') : ['U', 'S'];
-        const initials = (nameParts[0][0] + (nameParts[1] ? nameParts[1][0] : '')).toUpperCase();
-        userAvatarEl.textContent = initials;
-        
         // Load user data
         loadUserData();
         loadWithdrawals();
@@ -575,7 +540,7 @@
       }
     });
     
-       // Load user data from Firestore
+    // Load user data from Firestore
     async function loadUserData() {
       try {
         const userDoc = await db.collection('users').doc(currentUser.uid).get();
@@ -586,7 +551,8 @@
           
           // Generate referral link
           if (userData.phone) {
-            referralLinkEl.textContent = `${window.location.origin}/signup.html?ref=${userData.phone}`;
+            const baseUrl = window.location.origin;
+            referralLinkEl.textContent = `${baseUrl}/signup.html?ref=${userData.phone}`;
           }
         } else {
           console.error('User document does not exist');
@@ -680,17 +646,19 @@
     
     // Handle invest button click
     investBtn.addEventListener('click', async () => {
-      if (!userData || userData.accountBalance <= 0) {
-        alert('Your account balance is too low to invest.');
+      if (!userData || userData.accountBalance < 10000) {
+        alert('Minimum investment amount is 10,000 UGX');
         return;
       }
       
       try {
+        const investmentAmount = userData.accountBalance;
+        
         // Create investment record
         await db.collection('earnings').add({
           userId: currentUser.uid,
-          amount: userData.accountBalance,
-          dailyIncome: Math.round(userData.accountBalance * 0.1),
+          amount: investmentAmount,
+          dailyIncome: Math.round(investmentAmount * 0.1),
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
           remainingDays: 20
         });
@@ -700,12 +668,56 @@
           accountBalance: 0
         });
         
+        // Award referral bonus if applicable
+        if (userData.referrerPhone) {
+          // Find referrer user by phone
+          const referrerSnapshot = await db.collection('users')
+            .where('phone', '==', userData.referrerPhone)
+            .limit(1)
+            .get();
+          
+          if (!referrerSnapshot.empty) {
+            const referrerDoc = referrerSnapshot.docs[0];
+            const referrerId = referrerDoc.id;
+            const referrerData = referrerDoc.data();
+            
+            // Check if referral bonus already awarded for this user
+            const existingBonus = await db.collection('referrals')
+              .where('referrerId', '==', referrerId)
+              .where('refereeId', '==', currentUser.uid)
+              .limit(1)
+              .get();
+            
+            if (existingBonus.empty) {
+              // Calculate 20% referral bonus
+              const referralBonus = Math.round(investmentAmount * 0.2);
+              
+              // Update referrer's balance
+              await db.collection('users').doc(referrerId).update({
+                accountBalance: referrerData.accountBalance + referralBonus
+              });
+              
+              // Create referral record
+              await db.collection('referrals').add({
+                referrerId: referrerId,
+                refereeId: currentUser.uid,
+                refereeName: userData.name,
+                bonus: referralBonus,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                referrerEarned: referralBonus
+              });
+              
+              console.log(`Awarded ${referralBonus} UGX to referrer ${referrerId}`);
+            }
+          }
+        }
+        
         // Update UI
         userData.accountBalance = 0;
         accountBalanceEl.textContent = '0 UGX';
         generateInvestmentPlans();
         
-        alert(`Successfully invested ${userData.accountBalance.toLocaleString()} UGX! Your daily income will start tomorrow.`);
+        alert(`Successfully invested ${investmentAmount.toLocaleString()} UGX! Your daily income will start tomorrow.`);
       } catch (error) {
         console.error('Investment failed:', error);
         alert('Investment failed. Please try again.');
