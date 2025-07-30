@@ -635,7 +635,7 @@ display:none;
     // Load withdrawals data
     async function loadWithdrawals() {
       try {
-        const withdrawalsSnapshot = await db.collection('withdraws')
+        const withdrawalsSnapshot = await db.collection('withdrawals')
           .where('userId', '==', currentUser.uid)
           .where('status', '==', 'paid')
           .get();
