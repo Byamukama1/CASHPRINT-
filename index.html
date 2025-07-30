@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - CashPrint</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #d35400;
+      --primary-dark: #b03e00;
+      --secondary: #3498db;
+      --light: #f8f9fa;
+      --dark: #2c3e50;
+      --success: #27ae60;
+      --danger: #e74c3c;
+      --gray: #7f8c8d;
+      --light-gray: #ecf0f1;
+      --border-radius: 12px;
+      --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      margin-bottom: 30px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo h1 {
+      font-size: 28px;
+      font-weight: 800;
+    }
+    
+    .logo span:first-child {
+      color: var(--primary);
+    }
+    
+    .logo span:last-child {
+      color: var(--secondary);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    
+    .user-details {
+      text-align: right;
+    }
+    
+    .user-name {
+      font-weight: 600;
+      font-size: 18px;
+    }
+    
+    .logout-btn {
+      background: none;
+      border: none;
+      color: var(--gray);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 5px;
+    }
+    
+    .logout-btn:hover {
+      color: var(--primary);
+    }
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 25px;
+      transition: transform 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--gray);
+    }
+    
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .balance-card .card-icon {
+      background: rgba(52, 152, 219, 0.1);
+      color: var(--secondary);
+    }
+    
+    .withdrawn-card .card-icon {
+      background: rgba(231, 76, 60, 0.1);
+      color: var(--danger);
+    }
+    
+    .card-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+    
+    .card-subtext {
+      color: var(--gray);
+      font-size: 14px;
+    }
+    
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+    
+    .action-btn {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .action-btn i {
+      font-size: 32px;
+      margin-bottom: 15px;
+    }
+    
+    .deposit-btn {
+      color: var(--success);
+      background: rgba(39, 174, 96, 0.1);
+    }
+    
+    .withdraw-btn {
+      color: var(--danger);
+      background: rgba(231, 76, 60, 0.1);
+    }
+    
+    .invest-btn {
+      color: var(--secondary);
+      background: rgba(52, 152, 219, 0.1);
+    }
+    
+    .btn-label {
+      font-weight: 600;
+      font-size: 18px;
+    }
+    
+    .referral-section {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 25px;
+      margin-bottom: 40px;
+    }
+    
+    .section-title {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-title i {
+      color: var(--primary);
+    }
+    
+    .referral-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .referral-link {
+      flex: 1;
+      min-width: 300px;
+      background: var(--light-gray);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      border: 1px dashed var(--gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .copy-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .copy-btn:hover {
+      background: var(--primary-dark);
+    }
+    
+    .referral-note {
+      background: rgba(52, 152, 219, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--dark);
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .referral-note strong {
+      color: var(--success);
+    }
+    
+    .investment-plans {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 25px;
+      margin-bottom: 40px;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    .investment-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    .investment-table th,
+    .investment-table td {
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .investment-table th {
+      background: var(--light-gray);
+      font-weight: 600;
+    }
+    
+    .investment-table tbody tr:hover {
+      background: rgba(52, 152, 219, 0.05);
+    }
+    
+    .investment-table .highlight {
+      background: rgba(39, 174, 96, 0.1);
+      font-weight: 600;
+    }
+    
+    .referrals-section {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 25px;
+    }
+    
+    .referral-list {
+      margin-top: 20px;
+    }
+    
+    .referral-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .referral-item:last-child {
+      border-bottom: none;
+    }
+    
+    .referral-name {
+      font-weight: 600;
+    }
+    
+    .referral-bonus {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    .no-referrals {
+      text-align: center;
+      padding: 30px;
+      color: var(--gray);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: var(--gray);
+    }
+    
+    .loading i {
+      font-size: 24px;
+      margin-bottom: 15px;
+      display: block;
+    }
+    
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transform: translateX(200%);
+      transition: transform 0.3s;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    @media (max-width: 768px) {
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+      
+      .referral-container {
+        flex-direction: column;
+      }
+      
+      .referral-link,
+      .referral-note {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <h1><span>Cash</span><span>Print</span></h1>
+      </div>
+      <div class="user-info">
+        <div class="user-details">
+          <div class="user-name" id="userName">John Doe</div>
+          <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+        <div class="user-avatar" id="userAvatar">JD</div>
+      </div>
+    </header>
+    
+    <div class="dashboard-grid">
+      <div class="card balance-card">
+        <div class="card-header">
+          <div class="card-title">Account Balance</div>
+          <div class="card-icon"><i class="fas fa-wallet"></i></div>
+        </div>
+        <div class="card-value" id="accountBalance">0 UGX</div>
+        <div class="card-subtext">Available for withdrawal or investment</div>
+      </div>
+      
+      <div class="card withdrawn-card">
+        <div class="card-header">
+          <div class="card-title">Total Withdrawn</div>
+          <div class="card-icon"><i class="fas fa-money-bill-wave"></i></div>
+        </div>
+        <div class="card-value" id="totalWithdrawn">0 UGX</div>
+        <div class="card-subtext">Amount successfully paid to you</div>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <button class="action-btn deposit-btn" id="depositBtn">
+        <i class="fas fa-plus-circle"></i>
+        <div class="btn-label">Deposit</div>
+      </button>
+      
+      <button class="action-btn withdraw-btn" id="withdrawBtn">
+        <i class="fas fa-hand-holding-usd"></i>
+        <div class="btn-label">Withdraw</div>
+      </button>
+      
+      <button class="action-btn invest-btn" id="investBtn">
+        <i class="fas fa-chart-line"></i>
+        <div class="btn-label">Invest</div>
+      </button>
+    </div>
+    
+    <div class="referral-section">
+      <h2 class="section-title"><i class="fas fa-share-alt"></i> Your Referral Link</h2>
+      <div class="referral-container">
+        <div class="referral-link" id="referralLink">
+          <span id="linkText">https://cashprint.app/signup.html?ref=+256781234567</span>
+          <button class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+        <div class="referral-note">
+          <strong>Earn 1000 UGX</strong> for every friend who signs up using your referral link. 
+          Share this link to grow your earnings!
+        </div>
+      </div>
+    </div>
+    
+    <div class="investment-plans">
+      <h2 class="section-title"><i class="fas fa-coins"></i> Investment Plans</h2>
+      <div class="table-container">
+        <table class="investment-table">
+          <thead>
+            <tr>
+              <th>Amount (UGX)</th>
+              <th>Daily Income</th>
+              <th>Total Earnings</th>
+              <th>Days</th>
+            </tr>
+          </thead>
+          <tbody id="investmentPlans">
+            <!-- Investment plans will be generated here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="referrals-section">
+      <h2 class="section-title"><i class="fas fa-users"></i> Your Referrals</h2>
+      <div class="referral-list" id="referralList">
+        <div class="loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <div>Loading referrals...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast">Link copied to clipboard!</div>
+  
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
+      authDomain: "cashprint-c5e72.firebaseapp.com",
+      projectId: "cashprint-c5e72",
+      storageBucket: "cashprint-c5e72.firebasestorage.app",
+      messagingSenderId: "613734624925",
+      appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74",
+      measurementId: "G-X52TKV2D5J"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // DOM Elements
+    const accountBalanceEl = document.getElementById('accountBalance');
+    const totalWithdrawnEl = document.getElementById('totalWithdrawn');
+    const userNameEl = document.getElementById('userName');
+    const userAvatarEl = document.getElementById('userAvatar');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const depositBtn = document.getElementById('depositBtn');
+    const withdrawBtn = document.getElementById('withdrawBtn');
+    const investBtn = document.getElementById('investBtn');
+    const referralLinkEl = document.getElementById('linkText');
+    const copyBtn = document.getElementById('copyBtn');
+    const toastEl = document.getElementById('toast');
+    const investmentPlansEl = document.getElementById('investmentPlans');
+    const referralListEl = document.getElementById('referralList');
+    
+    // Current user data
+    let currentUser = null;
+    let userData = null;
+    
+    // Check authentication state
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        // Get user initials for avatar
+        const nameParts = user.displayName ? user.displayName.split(' ') : ['U', 'S'];
+        const initials = (nameParts[0][0] + (nameParts[1] ? nameParts[1][0] : '')).toUpperCase();
+        userAvatarEl.textContent = initials;
+        
+        // Load user data
+        loadUserData();
+        loadWithdrawals();
+        loadReferrals();
+      } else {
+        // Redirect to login if not authenticated
+        window.location.href = 'login.html';
+      }
+    });
+    
+       // Load user data from Firestore
+    async function loadUserData() {
+      try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (userDoc.exists) {
+          userData = userDoc.data();
+          userNameEl.textContent = userData.name;
+          accountBalanceEl.textContent = `${userData.accountBalance.toLocaleString()} UGX`;
+          
+          // Generate referral link
+          if (userData.phone) {
+            referralLinkEl.textContent = `${window.location.origin}/signup.html?ref=${userData.phone}`;
+          }
+        } else {
+          console.error('User document does not exist');
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+      
+      // Generate investment plans table
+      generateInvestmentPlans();
+    }
+    
+    // Load withdrawals data
+    async function loadWithdrawals() {
+      try {
+        const withdrawalsSnapshot = await db.collection('withdraws')
+          .where('userId', '==', currentUser.uid)
+          .where('status', '==', 'paid')
+          .get();
+        
+        let totalWithdrawn = 0;
+        withdrawalsSnapshot.forEach(doc => {
+          const data = doc.data();
+          totalWithdrawn += data.amount;
+        });
+        
+        totalWithdrawnEl.textContent = `${totalWithdrawn.toLocaleString()} UGX`;
+      } catch (error) {
+        console.error('Error loading withdrawals:', error);
+      }
+    }
+    
+    // Load referrals data
+    async function loadReferrals() {
+      try {
+        const referralsSnapshot = await db.collection('referrals')
+          .where('referrerId', '==', currentUser.uid)
+          .get();
+        
+        if (referralsSnapshot.empty) {
+          referralListEl.innerHTML = '<div class="no-referrals">You haven\'t referred anyone yet.</div>';
+          return;
+        }
+        
+        referralListEl.innerHTML = '';
+        
+        referralsSnapshot.forEach(doc => {
+          const referral = doc.data();
+          const referralItem = document.createElement('div');
+          referralItem.className = 'referral-item';
+          referralItem.innerHTML = `
+            <div class="referral-info">
+              <div class="referral-name">${referral.refereeName || 'Unknown User'}</div>
+              <div class="referral-date">${new Date(referral.timestamp?.toDate()).toLocaleDateString()}</div>
+            </div>
+            <div class="referral-bonus">+${referral.bonus.toLocaleString()} UGX</div>
+          `;
+          referralListEl.appendChild(referralItem);
+        });
+      } catch (error) {
+        console.error('Error loading referrals:', error);
+        referralListEl.innerHTML = '<div class="no-referrals">Error loading referrals.</div>';
+      }
+    }
+    
+    // Generate investment plans table
+    function generateInvestmentPlans() {
+      investmentPlansEl.innerHTML = '';
+      
+      // Generate plans from 50,000 to 500,000 in 50,000 increments
+      for (let amount = 50000; amount <= 500000; amount += 50000) {
+        const dailyIncome = Math.round(amount * 0.1); // 10% daily
+        const totalEarnings = dailyIncome * 20;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${amount.toLocaleString()}</td>
+          <td>${dailyIncome.toLocaleString()}</td>
+          <td>${totalEarnings.toLocaleString()}</td>
+          <td>20</td>
+        `;
+        
+        // Highlight if this matches the user's current balance
+        if (userData && amount === userData.accountBalance) {
+          row.classList.add('highlight');
+        }
+        
+        investmentPlansEl.appendChild(row);
+      }
+    }
+    
+    // Handle invest button click
+    investBtn.addEventListener('click', async () => {
+      if (!userData || userData.accountBalance <= 0) {
+        alert('Your account balance is too low to invest.');
+        return;
+      }
+      
+      try {
+        // Create investment record
+        await db.collection('earnings').add({
+          userId: currentUser.uid,
+          amount: userData.accountBalance,
+          dailyIncome: Math.round(userData.accountBalance * 0.1),
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          remainingDays: 20
+        });
+        
+        // Reset account balance to 0
+        await db.collection('users').doc(currentUser.uid).update({
+          accountBalance: 0
+        });
+        
+        // Update UI
+        userData.accountBalance = 0;
+        accountBalanceEl.textContent = '0 UGX';
+        generateInvestmentPlans();
+        
+        alert(`Successfully invested ${userData.accountBalance.toLocaleString()} UGX! Your daily income will start tomorrow.`);
+      } catch (error) {
+        console.error('Investment failed:', error);
+        alert('Investment failed. Please try again.');
+      }
+    });
+    
+    // Copy referral link to clipboard
+    copyBtn.addEventListener('click', () => {
+      const textArea = document.createElement('textarea');
+      textArea.value = referralLinkEl.textContent;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      // Show toast notification
+      toastEl.classList.add('show');
+      setTimeout(() => {
+        toastEl.classList.remove('show');
+      }, 3000);
+    });
+    
+    // Navigation buttons
+    depositBtn.addEventListener('click', () => {
+      window.location.href = 'deposit.html';
+    });
+    
+    withdrawBtn.addEventListener('click', () => {
+      window.location.href = 'withdraw.html';
+    });
+    
+    // Logout functionality
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = 'login.html';
+      });
+    });
+  </script>
+</body>
+</html>
