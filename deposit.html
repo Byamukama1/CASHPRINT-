@@ -1,0 +1,171 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CashPrint - Deposit</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .info-box, .history-box {
+      background: #f1f1f1;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .info-box strong {
+      color: #d35400;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #d35400;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .cancel-btn {
+      background: #e74c3c;
+      margin-top: 10px;
+    }
+    .help-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 18px;
+      background: none;
+      border: none;
+      color: #3498db;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .help-btn i {
+      margin-right: 5px;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="help-btn" onclick="window.open('https://wa.me/256769189468', '_blank')">
+      <i class="fab fa-whatsapp"></i> Help
+    </button>
+    <br>
+    <h2>Deposit to CashPrint</h2>
+    <div class="info-box">
+      <p><strong>No deposit charges.</strong></p>
+      <p>Send to:</p>
+      <p><strong>Phone:</strong> <span id="copyPhone">0769189468</span> <button onclick="copyText('0769189468')">Copy</button></p>
+      <p><strong>Name:</strong> Hasan Nkonge</p>
+    </div><input type="text" id="senderPhone" placeholder="Depositing Phone Number" required />
+<input type="text" id="senderName" placeholder="Depositor's Name" required />
+<input type="number" id="amount" placeholder="Enter amount to deposit" />
+<button onclick="submitDeposit()">Submit Deposit</button>
+
+<div class="history-box">
+  <h4>Deposit History</h4>
+  <div id="depositHistory">Loading...</div>
+</div>
+
+  </div>  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
+      authDomain: "cashprint-c5e72.firebaseapp.com",
+      projectId: "cashprint-c5e72",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text);
+      alert("Phone number copied!");
+    }
+
+    auth.onAuthStateChanged(async user => {
+      if (!user) return (window.location.href = "login.html");
+      const uid = user.uid;
+      loadDeposits(uid);
+    });
+
+    async function submitDeposit() {
+      const user = firebase.auth().currentUser;
+      const amount = parseInt(document.getElementById("amount").value);
+      const senderPhone = document.getElementById("senderPhone").value.trim();
+      const senderName = document.getElementById("senderName").value.trim();
+      if (!senderPhone || !senderName) return alert("Please enter depositing phone and name.");
+      if (isNaN(amount) || amount <= 0) return alert("Enter valid amount");
+
+      const snapshot = await db.collection("deposits").where("userId", "==", user.uid).where("status", "==", "pending").get();
+      if (!snapshot.empty) return alert("You already have a pending deposit. Cancel or complete it before submitting a new one.");
+
+      await db.collection("deposits").add({
+        userId: user.uid,
+        senderPhone,
+        senderName,
+        amount,
+        status: "pending",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+
+      alert("Deposit submitted! Will reflect in under 5 minutes.");
+      document.getElementById("amount").value = "";
+      document.getElementById("senderPhone").value = "";
+      document.getElementById("senderName").value = "";
+      loadDeposits(user.uid);
+    }
+
+    async function cancelDeposit(docId) {
+      await db.collection("deposits").doc(docId).delete();
+      alert("Deposit canceled.");
+      loadDeposits(firebase.auth().currentUser.uid);
+    }
+
+    async function loadDeposits(uid) {
+      const history = document.getElementById("depositHistory");
+      history.innerHTML = "";
+      const snapshot = await db.collection("deposits").where("userId", "==", uid).get();
+      if (snapshot.empty) return (history.textContent = "No deposits yet.");
+
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <strong>${d.amount} UGX</strong> - ${d.status.toUpperCase()}
+          ${d.status === "pending" ? `<button class='cancel-btn' onclick='cancelDeposit("${doc.id}")'>Cancel</button>` : ""}
+        `;
+        history.appendChild(div);
+      });
+    }
+  </script></body>
+</html>
