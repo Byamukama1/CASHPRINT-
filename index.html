@@ -10,388 +10,432 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
   :root {
-  --primary: #d35400;
-  --primary-dark: #b03e00;
-  --secondary: #3498db;
-  --success: #27ae60;
-  --danger: #e74c3c;
-  --dark: #2c3e50;
-  --gray: #7f8c8d;
-  --light-gray: #ecf0f1;
-  --border-radius: 12px;
-  --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-  color: var(--dark);
-  line-height: 1.6;
-  min-height: 100vh;
-  padding: 20px;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 20px 0;
-  margin-bottom: 20px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo h1 {
-  font-size: 28px;
-  font-weight: 800;
-}
-
-.logo span:first-child {
-  color: var(--primary);
-}
-
-.logo span:last-child {
-  color: var(--secondary);
-}
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.user-name {
-  font-weight: 600;
-  font-size: 18px;
-  margin-top: 5px;
-display:none;
-}
-
-.logout-btn {
-  background: none;
-  border: none;
-  color: var(--gray);
-  cursor: pointer;
-  font-size: 14px;
-  padding: 5px;
-}
-
-.logout-btn:hover {
-  color: var(--primary);
-}
-
-/* Summary cards */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 25px;
-}
-
-.summary-card {
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.summary-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--gray);
-  margin-bottom: 10px;
-}
-
-.summary-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--dark);
-  margin-bottom: 5px;
-}
-
-.summary-subtext {
-  color: var(--gray);
-  font-size: 13px;
-  margin-top: auto;
-}
-
-/* Action buttons in one row */
-.action-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.action-btn {
-  flex: 1;
-  padding: 10px 5px;
-  font-size: 12px;
-  background: white;
-  border: none;
-  border-radius: 8px;
-  box-shadow: var(--box-shadow);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.action-btn:hover {
-  transform: scale(1.02);
-}
-
-.action-btn i {
-  font-size: 16px;
-  margin-bottom: 5px;
-}
-
-.btn-label {
-  font-weight: 600;
-  font-size: 12px;
-}
-
-.deposit-btn {
-  color: var(--success);
-  background: rgba(39, 174, 96, 0.1);
-}
-
-.withdraw-btn {
-  color: var(--danger);
-  background: rgba(231, 76, 60, 0.1);
-}
-
-.invest-btn {
-  color: var(--secondary);
-  background: rgba(52, 152, 219, 0.1);
-}
-/* Referral section */
-/* Referral section */
-.referral-section {
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  padding: 16px;
-  margin-bottom: 25px;
-}
-
-.section-title {
-  font-size: 16px;
-  margin-bottom: 10px;
-  color: var(--dark);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.section-title i {
-  color: var(--primary);
-  font-size: 16px;
-}
-
-.referral-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.referral-link {
-  background: var(--light-gray);
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 13px;
-  border: 1px dashed var(--gray);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  word-break: break-word;
-}
-
-.copy-btn {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.copy-btn:hover {
-  background: var(--primary-dark);
-}
-
-.referral-note {
-  background: rgba(52, 152, 219, 0.1);
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 13px;
-  color: var(--dark);
-  line-height: 1.4;
-}
-
-.referral-note strong {
-  color: var(--success);
-}
-
-/* Investment plans */
-.investment-plans {
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  padding: 20px;
-  margin-bottom: 30px;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-.investment-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-  font-size: 14px;
-}
-
-.investment-table th,
-.investment-table td {
-  padding: 12px 10px;
-  text-align: center;
-  border-bottom: 1px solid var(--light-gray);
-}
-
-.investment-table th {
-  background: var(--light-gray);
-  font-weight: 600;
-}
-
-.investment-table tbody tr:hover {
-  background: rgba(52, 152, 219, 0.05);
-}
-
-.investment-table .highlight {
-  background: rgba(39, 174, 96, 0.1);
-  font-weight: 600;
-}
-
-/* Referrals list */
-.referrals-section {
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  padding: 20px;
-}
-
-.referral-list {
-  margin-top: 15px;
-}
-
-.referral-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 15px;
-  border-bottom: 1px solid var(--light-gray);
-}
-
-.referral-item:last-child {
-  border-bottom: none;
-}
-
-.referral-name {
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.referral-date {
-  font-size: 13px;
-  color: var(--gray);
-}
-
-.referral-bonus {
-  color: var(--success);
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.no-referrals {
-  text-align: center;
-  padding: 20px;
-  color: var(--gray);
-  font-size: 15px;
-}
-
-.loading {
-  text-align: center;
-  padding: 20px;
-  color: var(--gray);
-}
-
-.loading i {
-  font-size: 24px;
-  margin-bottom: 10px;
-  display: block;
-}
-
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: var(--success);
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  transform: translateX(200%);
-  transition: transform 0.3s;
-  z-index: 1000;
-  font-size: 14px;
-}
-
-.toast.show {
-  transform: translateX(0);
-}
-
-/* Responsive tweaks without breaking row layout */
-@media (max-width: 768px) {
-  .summary-grid {
-    grid-template-columns: 1fr;
+    --primary: #d35400;
+    --primary-dark: #b03e00;
+    --secondary: #3498db;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --dark: #2c3e50;
+    --gray: #7f8c8d;
+    --light-gray: #ecf0f1;
+    --border-radius: 12px;
+    --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   }
 
-  .referral-container {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+    color: var(--dark);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 0;
+    margin-bottom: 20px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo h1 {
+    font-size: 28px;
+    font-weight: 800;
+  }
+
+  .logo span:first-child {
+    color: var(--primary);
+  }
+
+  .logo span:last-child {
+    color: var(--secondary);
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .user-name {
+    font-weight: 600;
+    font-size: 18px;
+    margin-top: 5px;
+  }
+
+  .logout-btn {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px;
+  }
+
+  .logout-btn:hover {
+    color: var(--primary);
+  }
+
+  /* Summary cards */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+  }
+
+  .summary-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    display: flex;
     flex-direction: column;
   }
 
-  .referral-link,
+  .summary-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray);
+    margin-bottom: 10px;
+  }
+
+  .summary-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 5px;
+  }
+
+  .summary-subtext {
+    color: var(--gray);
+    font-size: 13px;
+    margin-top: auto;
+  }
+
+  /* Action buttons in one row */
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 10px 5px;
+    font-size: 12px;
+    background: white;
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .action-btn:hover {
+    transform: scale(1.02);
+  }
+
+  .action-btn i {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  .btn-label {
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .deposit-btn {
+    color: var(--success);
+    background: rgba(39, 174, 96, 0.1);
+  }
+
+  .withdraw-btn {
+    color: var(--danger);
+    background: rgba(231, 76, 60, 0.1);
+  }
+
+  .invest-btn {
+    color: var(--secondary);
+    background: rgba(52, 152, 219, 0.1);
+  }
+
+  /* Earnings section */
+  .earnings-section {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title i {
+    color: var(--primary);
+    font-size: 16px;
+  }
+
+  .earnings-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 14px;
+  }
+
+  .earnings-table th,
+  .earnings-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .earnings-table th {
+    background: var(--light-gray);
+    font-weight: 600;
+  }
+
+  .earnings-table tbody tr:hover {
+    background: rgba(52, 152, 219, 0.05);
+  }
+
+  .earnings-table .active-earning {
+    background: rgba(39, 174, 96, 0.1);
+    font-weight: 600;
+  }
+
+  .no-earnings {
+    text-align: center;
+    padding: 20px;
+    color: var(--gray);
+    font-size: 15px;
+  }
+
+  /* Referral section */
+  .referral-section {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 16px;
+    margin-bottom: 25px;
+  }
+
+  .referral-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .referral-link {
+    background: var(--light-gray);
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px dashed var(--gray);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    word-break: break-word;
+  }
+
+  .copy-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .copy-btn:hover {
+    background: var(--primary-dark);
+  }
+
   .referral-note {
-    min-width: 100%;
+    background: rgba(52, 152, 219, 0.1);
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--dark);
+    line-height: 1.4;
+  }
+
+  .referral-note strong {
+    color: var(--success);
+  }
+
+  /* Investment plans */
+  .investment-plans {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+
+  .table-container {
+    overflow-x: auto;
   }
 
   .investment-table {
-    font-size: 13px;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 14px;
   }
-}
+
+  .investment-table th,
+  .investment-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .investment-table th {
+    background: var(--light-gray);
+    font-weight: 600;
+  }
+
+  .investment-table tbody tr:hover {
+    background: rgba(52, 152, 219, 0.05);
+  }
+
+  .investment-table .highlight {
+    background: rgba(39, 174, 96, 0.1);
+    font-weight: 600;
+  }
+
+  /* Referrals list */
+  .referrals-section {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+  }
+
+  .referral-list {
+    margin-top: 15px;
+  }
+
+  .referral-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .referral-item:last-child {
+    border-bottom: none;
+  }
+
+  .referral-name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .referral-date {
+    font-size: 13px;
+    color: var(--gray);
+  }
+
+  .referral-bonus {
+    color: var(--success);
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .no-referrals {
+    text-align: center;
+    padding: 20px;
+    color: var(--gray);
+    font-size: 15px;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--gray);
+  }
+
+  .loading i {
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--success);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(200%);
+    transition: transform 0.3s;
+    z-index: 1000;
+    font-size: 14px;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+    .summary-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .referral-container {
+      flex-direction: column;
+    }
+
+    .referral-link,
+    .referral-note {
+      min-width: 100%;
+    }
+
+    .investment-table,
+    .earnings-table {
+      font-size: 13px;
+    }
+  }
   </style>
 </head>
 
@@ -408,7 +452,7 @@ display:none;
         </div>
       </div>
     </header>
-    
+
     <!-- Compact summary section -->
     <div class="summary-grid">
       <div class="summary-card">
@@ -423,8 +467,7 @@ display:none;
         <div class="summary-subtext">Amount successfully paid to you</div>
       </div>
     </div>
-    
-    <!-- Action buttons -->
+     <!-- Action buttons -->
     <div class="action-buttons">
       <button class="action-btn deposit-btn" id="depositBtn">
         <i class="fas fa-plus-circle"></i>
@@ -440,6 +483,28 @@ display:none;
         <i class="fas fa-chart-line"></i>
         <div class="btn-label">Invest</div>
       </button>
+    </div>
+    
+    <!-- Earnings section -->
+    <div class="earnings-section">
+      <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Your Earnings</h2>
+      <div class="table-container">
+        <table class="earnings-table">
+          <thead>
+            <tr>
+              <th>Amount Invested</th>
+              <th>Daily Income</th>
+              <th>Remaining Days</th>
+              <th>Total Earned</th>
+            </tr>
+          </thead>
+          <tbody id="earningsList">
+            <tr>
+              <td colspan="4" class="no-earnings">Loading earnings...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     
     <!-- Referral section -->
@@ -490,7 +555,6 @@ display:none;
   
   <div class="toast" id="toast">Link copied to clipboard!</div>
   
-
   <script>
     // Firebase configuration
     const firebaseConfig = {
@@ -521,6 +585,7 @@ display:none;
     const toastEl = document.getElementById('toast');
     const investmentPlansEl = document.getElementById('investmentPlans');
     const referralListEl = document.getElementById('referralList');
+    const earningsListEl = document.getElementById('earningsList');
     
     // Current user data
     let currentUser = null;
@@ -534,6 +599,7 @@ display:none;
         loadUserData();
         loadWithdrawals();
         loadReferrals();
+        loadEarnings();
       } else {
         // Redirect to login if not authenticated
         window.location.href = 'login.html';
@@ -618,6 +684,44 @@ display:none;
       }
     }
     
+    // Load earnings data
+    async function loadEarnings() {
+      try {
+        const earningsSnapshot = await db.collection('earnings')
+          .where('userId', '==', currentUser.uid)
+          .get();
+        
+        if (earningsSnapshot.empty) {
+          earningsListEl.innerHTML = '<tr><td colspan="4" class="no-earnings">No earnings yet. Make your first investment to start earning!</td></tr>';
+          return;
+        }
+        
+        earningsListEl.innerHTML = '';
+        
+        earningsSnapshot.forEach(doc => {
+          const earning = doc.data();
+          const daysPassed = 20 - earning.remainingDays;
+          const totalEarned = daysPassed * earning.dailyIncome;
+          
+          const row = document.createElement('tr');
+          if (earning.remainingDays > 0) {
+            row.classList.add('active-earning');
+          }
+          
+          row.innerHTML = `
+            <td>${earning.amount.toLocaleString()} UGX</td>
+            <td>${earning.dailyIncome.toLocaleString()} UGX</td>
+            <td>${earning.remainingDays}</td>
+            <td>${totalEarned.toLocaleString()} UGX</td>
+          `;
+          earningsListEl.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error loading earnings:', error);
+        earningsListEl.innerHTML = '<tr><td colspan="4" class="no-earnings">Error loading earnings.</td></tr>';
+      }
+    }
+    
     // Generate investment plans table
     function generateInvestmentPlans() {
       investmentPlansEl.innerHTML = '';
@@ -668,7 +772,7 @@ display:none;
           accountBalance: 0
         });
         
-        // Award referral bonus if applicable
+   // Award referral bonus if applicable
         if (userData.referrerPhone) {
           // Find referrer user by phone
           const referrerSnapshot = await db.collection('users')
@@ -716,6 +820,7 @@ display:none;
         userData.accountBalance = 0;
         accountBalanceEl.textContent = '0 UGX';
         generateInvestmentPlans();
+        loadEarnings(); // Reload earnings after new investment
         
         alert(`Successfully invested ${investmentAmount.toLocaleString()} UGX! Your daily income will start tomorrow.`);
       } catch (error) {
