@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -76,28 +77,29 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <button class="help-btn" onclick="window.open('https://wa.me/256769189468', '_blank')">
-      <i class="fab fa-whatsapp"></i> Help
-    </button>
-    <br>
+  
     <h2>Deposit to CashPrint</h2>
+
     <div class="info-box">
       <p><strong>No deposit charges.</strong></p>
-      <p>Send to:</p>
-      <p><strong>Phone:</strong> <span id="copyPhone">0769189468</span> <button onclick="copyText('0769189468')">Copy</button></p>
-      <p><strong>Name:</strong> Hasan Nkonge</p>
-    </div><input type="text" id="senderPhone" placeholder="Depositing Phone Number" required />
-<input type="text" id="senderName" placeholder="Depositor's Name" required />
-<input type="number" id="amount" placeholder="Enter amount to deposit" />
-<button onclick="submitDeposit()">Submit Deposit</button>
+      <p>Send to any of the numbers below:</p>
+      <p><strong>Phone 1:</strong> <span id="copyPhone1">0702940898</span> <button onclick="copyText('0702940898')">Copy</button></p>
+      <p><strong>Phone 2:</strong> <span id="copyPhone2">0791884275</span> <button onclick="copyText('0791884275')">Copy</button></p>
+      <p><strong>Name:</strong> Akampurira Richard</p>
+    </div>
 
-<div class="history-box">
-  <h4>Deposit History</h4>
-  <div id="depositHistory">Loading...</div>
-</div>
+    <input type="text" id="senderPhone" placeholder="Depositing Phone Number" required />
+    <input type="text" id="senderName" placeholder="Depositor's Name" required />
+    <input type="number" id="amount" placeholder="Enter amount to deposit" />
+    <button onclick="submitDeposit()">Submit Deposit</button>
 
-  </div>  <script>
+    <div class="history-box">
+      <h4>Deposit History</h4>
+      <div id="depositHistory">Loading...</div>
+    </div>
+  </div>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
       authDomain: "cashprint-c5e72.firebaseapp.com",
@@ -167,5 +169,6 @@
         history.appendChild(div);
       });
     }
-  </script></body>
+  </script>
+</body>
 </html>
