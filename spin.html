@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CashPrint - Spin to Win</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 { color: #d35400; }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    #wheel {
+      width: 200px;
+      height: 200px;
+      margin: 20px auto;
+      border: 10px solid #d35400;
+      border-radius: 50%;
+      border-top-color: transparent;
+    }
+    .spin { animation: spin 1.2s ease-out; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(720deg); }
+    }
+    #winnerList {
+      margin-top: 20px;
+      text-align: left;
+      padding: 10px;
+      background: #fff;
+      border-radius: 8px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #winnerList p {
+      margin: 5px 0;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Spin to Win</h1>
+  <p>Enter the password shared in the WhatsApp group:</p>
+  <input type="text" id="passwordInput" placeholder="Enter spin password" />
+  <button onclick="submitSpin()">Spin Now</button>
+  <div id="wheel"></div>
+  <div id="message"></div>
+
+  <h3>Latest Winners</h3>
+  <div id="winnerList">Loading...</div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
+      authDomain: "cashprint-c5e72.firebaseapp.com",
+      projectId: "cashprint-c5e72",
+      storageBucket: "cashprint-c5e72.appspot.com",
+      messagingSenderId: "613734624925",
+      appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const passwordInput = document.getElementById("passwordInput");
+    const message = document.getElementById("message");
+    const wheel = document.getElementById("wheel");
+    const winnerList = document.getElementById("winnerList");
+
+    async function submitSpin() {
+      message.textContent = "";
+      wheel.classList.remove("spin");
+      const password = passwordInput.value.trim();
+      if (!password) return alert("Enter the spin password");
+
+      const user = auth.currentUser;
+      if (!user) return alert("Please login first");
+
+      const userId = user.uid;
+      const userDoc = await db.collection("users").doc(userId).get();
+      const userName = userDoc.exists ? (userDoc.data().name || "Anonymous") : "Anonymous";
+
+      // Already won this round?
+      const userSpins = await db.collection("spins")
+        .where("userId", "==", userId)
+        .get();
+      for (const doc of userSpins.docs) {
+        if (doc.data().roundPassword === password) {
+          return message.textContent = "You already spun this round.";
+        }
+      }
+
+      // Limit to first 10 users
+      const roundSpins = await db.collection("spins")
+        .get();
+      let spinCount = 0;
+      roundSpins.forEach(doc => {
+        if (doc.data().roundPassword === password) spinCount++;
+      });
+      if (spinCount >= 10) {
+        return message.textContent = "This round is full. Wait for next one.";
+      }
+
+      // Check referral eligibility
+      let eligible = false;
+      const refs = await db.collection("referrals")
+        .where("referrerId", "==", userId)
+        .get();
+      let referralDoc = null;
+      for (const doc of refs.docs) {
+        if (!doc.data().spinStatus) {
+          eligible = true;
+          referralDoc = doc;
+          break;
+        }
+      }
+
+      // Check earnings if no eligible referral
+      if (!eligible) {
+        const earnings = await db.collection("earnings")
+          .where("userId", "==", userId)
+          .get();
+        earnings.forEach(doc => {
+          if (doc.data().remainingDays > 0) eligible = true;
+        });
+      }
+
+      if (!eligible) {
+        return message.textContent = "You need active earnings or valid referral to spin.";
+      }
+
+      // Mark referral as awarded
+      if (referralDoc) {
+        await referralDoc.ref.update({ spinStatus: "awarded" });
+      }
+
+      // Spin animation
+      wheel.classList.add("spin");
+      setTimeout(async () => {
+        await db.collection("spins").add({
+          userId,
+          userName,
+          roundPassword: password,
+          amountWon: 500,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        message.textContent = "🎉 You won 500 UGX!";
+        loadWinners();
+      }, 1200);
+    }
+
+    async function loadWinners() {
+      const spins = await db.collection("spins").get();
+      const sorted = spins.docs
+        .map(doc => doc.data())
+        .sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0))
+        .slice(0, 10);
+      if (sorted.length === 0) {
+        winnerList.innerHTML = "No winners yet.";
+        return;
+      }
+      winnerList.innerHTML = "";
+      sorted.forEach(d => {
+        const time = d.timestamp?.toDate().toLocaleString();
+        winnerList.innerHTML += `<p>🎉 ${d.userName} - 500 UGX on ${time}</p>`;
+      });
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) loadWinners();
+      else window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>
