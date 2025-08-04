@@ -89,10 +89,16 @@
       if (!user) return alert("Please login first");
 
       const userId = user.uid;
-      const userDoc = await db.collection("users").doc(userId).get();
-      const userName = userDoc.exists ? (userDoc.data().name || "Anonymous") : "Anonymous";
+      const userDocRef = db.collection("users").doc(userId);
+      const userDocSnap = await userDocRef.get();
 
-      // Already won this round?
+      if (!userDocSnap.exists) return alert("User data not found");
+
+      const userData = userDocSnap.data();
+      const userName = userData.name || "Anonymous";
+      const currentBalance = userData.accountBalance || 0;
+
+      // Already spun this round?
       const userSpins = await db.collection("spins")
         .where("userId", "==", userId)
         .get();
@@ -102,9 +108,8 @@
         }
       }
 
-      // Limit to first 10 users
-      const roundSpins = await db.collection("spins")
-        .get();
+      // Check total spins for this round
+      const roundSpins = await db.collection("spins").get();
       let spinCount = 0;
       roundSpins.forEach(doc => {
         if (doc.data().roundPassword === password) spinCount++;
@@ -115,10 +120,10 @@
 
       // Check referral eligibility
       let eligible = false;
+      let referralDoc = null;
       const refs = await db.collection("referrals")
         .where("referrerId", "==", userId)
         .get();
-      let referralDoc = null;
       for (const doc of refs.docs) {
         if (!doc.data().spinStatus) {
           eligible = true;
@@ -127,7 +132,7 @@
         }
       }
 
-      // Check earnings if no eligible referral
+      // Check earnings if no valid referral
       if (!eligible) {
         const earnings = await db.collection("earnings")
           .where("userId", "==", userId)
@@ -141,22 +146,31 @@
         return message.textContent = "You need active earnings or valid referral to spin.";
       }
 
-      // Mark referral as awarded
-      if (referralDoc) {
-        await referralDoc.ref.update({ spinStatus: "awarded" });
-      }
-
       // Spin animation
       wheel.classList.add("spin");
       setTimeout(async () => {
+        // Mark referral as awarded
+        if (referralDoc) {
+          await referralDoc.ref.update({ spinStatus: "awarded" });
+        }
+
+        const amountWon = 500;
+
+        // Save spin record
         await db.collection("spins").add({
           userId,
           userName,
           roundPassword: password,
-          amountWon: 500,
+          amountWon,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
-        message.textContent = "🎉 You won 500 UGX!";
+
+        // Add to user balance
+        await userDocRef.update({
+          accountBalance: currentBalance + amountWon
+        });
+
+        message.textContent = `🎉 You won ${amountWon} UGX!`;
         loadWinners();
       }, 1200);
     }
