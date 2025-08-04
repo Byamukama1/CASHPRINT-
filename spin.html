@@ -82,49 +82,58 @@
     async function submitSpin() {
       message.textContent = "";
       wheel.classList.remove("spin");
-      const password = passwordInput.value.trim();
-      if (!password) return alert("Enter the spin password");
+
+      const inputPassword = passwordInput.value.trim();
+      if (!inputPassword) return alert("Enter the spin password");
 
       const user = auth.currentUser;
       if (!user) return alert("Please login first");
 
       const userId = user.uid;
-      const userDocRef = db.collection("users").doc(userId);
-      const userDocSnap = await userDocRef.get();
+      const userDoc = await db.collection("users").doc(userId).get();
+      if (!userDoc.exists) return alert("User not found");
 
-      if (!userDocSnap.exists) return alert("User data not found");
-
-      const userData = userDocSnap.data();
+      const userData = userDoc.data();
       const userName = userData.name || "Anonymous";
       const currentBalance = userData.accountBalance || 0;
 
-      // Already spun this round?
-      const userSpins = await db.collection("spins")
-        .where("userId", "==", userId)
+      // Check password validity
+      const passwordSnapshot = await db.collection("spinPasswords")
+        .where("password", "==", inputPassword)
         .get();
-      for (const doc of userSpins.docs) {
-        if (doc.data().roundPassword === password) {
-          return message.textContent = "You already spun this round.";
-        }
+      if (passwordSnapshot.empty) return message.textContent = "Invalid password.";
+
+      const passwordDoc = passwordSnapshot.docs[0];
+      const expiresAt = passwordDoc.data().expiresAt?.toDate();
+      if (!expiresAt || new Date() > expiresAt) {
+        return message.textContent = "This password has expired.";
       }
 
-      // Check total spins for this round
-      const roundSpins = await db.collection("spins").get();
-      let spinCount = 0;
-      roundSpins.forEach(doc => {
-        if (doc.data().roundPassword === password) spinCount++;
-      });
-      if (spinCount >= 10) {
-        return message.textContent = "This round is full. Wait for next one.";
+      // Check if user already spun
+      const alreadySpun = await db.collection("spins")
+        .where("userId", "==", userId)
+        .where("roundPassword", "==", inputPassword)
+        .get();
+      if (!alreadySpun.empty) {
+        return message.textContent = "You already spun in this round.";
       }
 
-      // Check referral eligibility
+      // Limit to 10 winners
+      const winners = await db.collection("spins")
+        .where("roundPassword", "==", inputPassword)
+        .get();
+      if (winners.size >= 10) {
+        return message.textContent = "This round is full. Try next one.";
+      }
+
+      // Eligibility: either referral not awarded or active earnings
       let eligible = false;
       let referralDoc = null;
-      const refs = await db.collection("referrals")
+
+      const referrals = await db.collection("referrals")
         .where("referrerId", "==", userId)
         .get();
-      for (const doc of refs.docs) {
+      for (const doc of referrals.docs) {
         if (!doc.data().spinStatus) {
           eligible = true;
           referralDoc = doc;
@@ -132,41 +141,43 @@
         }
       }
 
-      // Check earnings if no valid referral
       if (!eligible) {
         const earnings = await db.collection("earnings")
           .where("userId", "==", userId)
           .get();
-        earnings.forEach(doc => {
-          if (doc.data().remainingDays > 0) eligible = true;
-        });
+        for (const doc of earnings.docs) {
+          if ((doc.data().remainingDays || 0) > 0) {
+            eligible = true;
+            break;
+          }
+        }
       }
 
       if (!eligible) {
-        return message.textContent = "You need active earnings or valid referral to spin.";
+        return message.textContent = "You need active earnings or a valid referral to spin.";
       }
 
-      // Spin animation
+      // Spin animation and award
       wheel.classList.add("spin");
       setTimeout(async () => {
-        // Mark referral as awarded
+        const amountWon = 500;
+
+        // Update referral as awarded
         if (referralDoc) {
           await referralDoc.ref.update({ spinStatus: "awarded" });
         }
 
-        const amountWon = 500;
-
-        // Save spin record
+        // Save spin
         await db.collection("spins").add({
           userId,
           userName,
-          roundPassword: password,
+          roundPassword: inputPassword,
           amountWon,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // Add to user balance
-        await userDocRef.update({
+        // Update user balance
+        await db.collection("users").doc(userId).update({
           accountBalance: currentBalance + amountWon
         });
 
@@ -176,19 +187,16 @@
     }
 
     async function loadWinners() {
-      const spins = await db.collection("spins").get();
-      const sorted = spins.docs
-        .map(doc => doc.data())
-        .sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0))
-        .slice(0, 10);
-      if (sorted.length === 0) {
+      const snapshot = await db.collection("spins").orderBy("timestamp", "desc").limit(10).get();
+      if (snapshot.empty) {
         winnerList.innerHTML = "No winners yet.";
         return;
       }
       winnerList.innerHTML = "";
-      sorted.forEach(d => {
-        const time = d.timestamp?.toDate().toLocaleString();
-        winnerList.innerHTML += `<p>🎉 ${d.userName} - 500 UGX on ${time}</p>`;
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const time = data.timestamp?.toDate().toLocaleString() || "recently";
+        winnerList.innerHTML += `<p>🎉 ${data.userName} - 500 UGX on ${time}</p>`;
       });
     }
 
