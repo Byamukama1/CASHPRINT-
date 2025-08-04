@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Referrals - CashPrint</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      color: #2c3e50;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #d35400;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: center;
+      border-bottom: 1px solid #ecf0f1;
+    }
+
+    th {
+      background: #f1f1f1;
+      font-weight: bold;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .logout-btn {
+      float: right;
+      background: none;
+      border: none;
+      color: #e74c3c;
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .loading, .error {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="logout-btn" onclick="logout()">Logout</button>
+    <h2>👥 Your Referrals Summary</h2>
+    <div id="referralsContainer">
+      <div class="loading">Loading referrals...</div>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
+      authDomain: "cashprint-c5e72.firebaseapp.com",
+      projectId: "cashprint-c5e72",
+      storageBucket: "cashprint-c5e72.appspot.com",
+      messagingSenderId: "613734624925",
+      appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let userData = null;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        await loadUserInfo();
+        loadReferrals();
+      } else {
+        window.location.href = 'login.html';
+      }
+    });
+
+    async function loadUserInfo() {
+      const doc = await db.collection('users').doc(currentUser.uid).get();
+      userData = doc.data();
+    }
+
+    async function loadReferrals() {
+      const container = document.getElementById('referralsContainer');
+      container.innerHTML = '';
+
+      try {
+        const usersSnap = await db.collection('users')
+          .where('referrerPhone', '==', userData.phone)
+          .get();
+
+        if (usersSnap.empty) {
+          container.innerHTML = '<div class="error">No users have used your referral link yet.</div>';
+          return;
+        }
+
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone Number</th>
+              <th>Total Approved Deposits (UGX)</th>
+            </tr>
+          </thead>
+          <tbody id="referralTableBody">
+            <tr><td colspan="3">Calculating...</td></tr>
+          </tbody>
+        `;
+        container.appendChild(table);
+
+        const tbody = document.getElementById('referralTableBody');
+        tbody.innerHTML = '';
+
+        for (const doc of usersSnap.docs) {
+          const referred = doc.data();
+          const userId = doc.id;
+
+          let totalDeposits = 0;
+          const depositsSnap = await db.collection('deposits')
+            .where('userId', '==', userId)
+            .where('status', '==', 'approved')
+            .get();
+
+          depositsSnap.forEach(d => {
+            totalDeposits += d.data().amount || 0;
+          });
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${referred.name || 'Unknown'}</td>
+            <td>${referred.phone || 'N/A'}</td>
+            <td>${totalDeposits.toLocaleString()}</td>
+          `;
+          tbody.appendChild(row);
+        }
+      } catch (err) {
+        console.error('Error loading referrals:', err);
+        container.innerHTML = '<div class="error">Failed to load referral data. Please try again.</div>';
+      }
+    }
+
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = 'login.html';
+      });
+    }
+  </script>
+</body>
+</html>
