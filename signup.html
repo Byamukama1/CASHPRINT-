@@ -1,222 +1,200 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Sign Up - CashPrint</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .container {
-      max-width: 420px;
-      width: 90%;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      padding: 35px 30px;
-      position: relative;
-    }
-
-    .logo {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .logo h1 {
-      color: #d35400;
-      font-size: 28px;
-      margin: 0;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-
-    .logo span {
-      color: #3498db;
-    }
-
-    .bonus-note {
-      text-align: center;
-      background: #eaf7ff;
-      padding: 10px;
-      border-radius: 8px;
-      margin: 15px 0;
-      font-size: 15px;
-      color: #2c3e50;
-    }
-
-    .bonus-note strong {
-      color: #27ae60;
-    }
-
-    h2 {
-      text-align: center;
-      color: #2c3e50;
-      margin: 15px 0 25px;
-      font-weight: 600;
-      font-size: 24px;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px 15px;
-      margin: 12px 0;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      box-sizing: border-box;
-      transition: all 0.3s;
-    }
-
-    input:focus {
-      border-color: #3498db;
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-      outline: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 15px;
-      margin: 20px 0 15px;
-      font-size: 17px;
-      border-radius: 8px;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s;
-      background: linear-gradient(to right, #e67e22, #d35400);
-      color: white;
-      box-shadow: 0 4px 15px rgba(211, 84, 0, 0.2);
-    }
-
-    button:hover {
-      background: linear-gradient(to right, #d35400, #e67e22);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(211, 84, 0, 0.25);
-    }
-
-    .login-link {
-      text-align: center;
-      margin-top: 20px;
-      color: #7f8c8d;
-      font-size: 16px;
-    }
-
-    .login-link a {
-      color: #3498db;
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.3s;
-    }
-
-    .login-link a:hover {
-      color: #2980b9;
-      text-decoration: underline;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 25px;
-      color: #95a5a6;
-      font-size: 14px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="container">
-    <!-- CashPrint Logo -->
-    <div class="logo">
-      <h1>Cash<span>Print</span></h1>
-    </div>
-    
-    <h2>Create Your Account</h2>
-    
-    <!-- Bonus Note -->
-    <div class="bonus-note">
-      Sign up now and get <strong>2000 UGX</strong> welcome bonus!
-    </div>
-    
-    <form id="signupForm">
-      <input type="text" id="name" placeholder="Full Name" required />
-      <input type="email" id="email" placeholder="Email Address" required />
-      <input type="tel" id="phone" placeholder="Phone Number" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <button type="submit">Sign Up</button>
-    </form>
-    
-    <!-- Login Link -->
-    <div class="login-link">
-      Already have an account? <a href="login.html">Login</a>
-    </div>
-    
-    <!-- Footer -->
-    <div class="footer">
-      &copy; 2023 CashPrint. All rights reserved.
-    </div>
-  </div>
-
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
-      authDomain: "cashprint-c5e72.firebaseapp.com",
-      projectId: "cashprint-c5e72",
-      storageBucket: "cashprint-c5e72.firebasestorage.app",
-      messagingSenderId: "613734624925",
-      appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74",
-      measurementId: "G-X52TKV2D5J"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Get referrer from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const referrerPhone = urlParams.get('ref') || "";
-
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const password = document.getElementById('password').value;
-
-      try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-
-        await db.collection("users").doc(user.uid).set({
-          userId: user.uid,
-          name: name,
-          email: email,
-          phone: phone,
-          referrerPhone: referrerPhone,
-          accountBalance: 2000
-        });
-
-        alert("Account created! Welcome bonus of 2000 UGX awarded.");
-        window.location.href = "login.html";
-      } catch (error) {
-        alert("Signup failed: " + error.message);
-      }
-    });
-  </script>
-
-</body>
-</html>
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
+  <title>CashPrint - Spin to Win</title>  
+  <style>  
+    body {  
+      font-family: Arial, sans-serif;  
+      background: #f9f9f9;  
+      padding: 20px;  
+      text-align: center;  
+    }  
+    h1 { color: #d35400; }  
+    input, button {  
+      padding: 10px;  
+      margin: 10px;  
+      font-size: 16px;  
+    }  
+    #wheel {  
+      width: 200px;  
+      height: 200px;  
+      margin: 20px auto;  
+      border: 10px solid #d35400;  
+      border-radius: 50%;  
+      border-top-color: transparent;  
+    }  
+    .spin { animation: spin 1.2s ease-out; }  
+    @keyframes spin {  
+      0% { transform: rotate(0deg); }  
+      100% { transform: rotate(720deg); }  
+    }  
+    #winnerList {  
+      margin-top: 20px;  
+      text-align: left;  
+      padding: 10px;  
+      background: #fff;  
+      border-radius: 8px;  
+      max-width: 400px;  
+      margin-left: auto;  
+      margin-right: auto;  
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);  
+    }  
+    #winnerList p {  
+      margin: 5px 0;  
+      font-size: 15px;  
+    }  
+  </style>  
+</head>  
+<body>  
+  <h1>Spin to Win</h1>  
+  <p>Enter the password shared in the WhatsApp group:</p>  
+  <input type="text" id="passwordInput" placeholder="Enter spin password" />  
+  <button onclick="submitSpin()">Spin Now</button>  
+  <div id="wheel"></div>  
+  <div id="message"></div>    <h3>Latest Winners</h3>  
+  <div id="winnerList">Loading...</div>    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>    <script>  
+    const firebaseConfig = {  
+      apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",  
+      authDomain: "cashprint-c5e72.firebaseapp.com",  
+      projectId: "cashprint-c5e72",  
+      storageBucket: "cashprint-c5e72.appspot.com",  
+      messagingSenderId: "613734624925",  
+      appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74"  
+    };  
+    firebase.initializeApp(firebaseConfig);  
+    const auth = firebase.auth();  
+    const db = firebase.firestore();  
+  
+    const passwordInput = document.getElementById("passwordInput");  
+    const message = document.getElementById("message");  
+    const wheel = document.getElementById("wheel");  
+    const winnerList = document.getElementById("winnerList");  
+  
+    async function submitSpin() {  
+      message.textContent = "";  
+      wheel.classList.remove("spin");  
+  
+      const inputPassword = passwordInput.value.trim();  
+      if (!inputPassword) return alert("Enter the spin password");  
+  
+      const user = auth.currentUser;  
+      if (!user) return alert("Please login first");  
+  
+      const userId = user.uid;  
+      const userDoc = await db.collection("users").doc(userId).get();  
+      if (!userDoc.exists) return alert("User not found");  
+  
+      const userData = userDoc.data();  
+      const userName = userData.name || "Anonymous";  
+      const currentBalance = userData.accountBalance || 0;  
+  
+      // Check password validity  
+      const passwordSnapshot = await db.collection("spinPasswords")  
+        .where("password", "==", inputPassword)  
+        .get();  
+      if (passwordSnapshot.empty) return message.textContent = "Invalid password.";  
+  
+      const passwordDoc = passwordSnapshot.docs[0];  
+      const expiresAt = passwordDoc.data().expiresAt?.toDate();  
+      if (!expiresAt || new Date() > expiresAt) {  
+        return message.textContent = "This password has expired.";  
+      }  
+  
+      // Check if user already spun  
+      const alreadySpun = await db.collection("spins")  
+        .where("userId", "==", userId)  
+        .where("roundPassword", "==", inputPassword)  
+        .get();  
+      if (!alreadySpun.empty) {  
+        return message.textContent = "You already spun in this round.";  
+      }  
+  
+      // Limit to 10 winners  
+      const winners = await db.collection("spins")  
+        .where("roundPassword", "==", inputPassword)  
+        .get();  
+      if (winners.size >= 10) {  
+        return message.textContent = "This round is full. Try next one.";  
+      }  
+  
+      // Eligibility: either referral not awarded or active earnings  
+      let eligible = false;  
+      let referralDoc = null;  
+  
+      const referrals = await db.collection("referrals")  
+        .where("referrerId", "==", userId)  
+        .get();  
+      for (const doc of referrals.docs) {  
+        if (!doc.data().spinStatus) {  
+          eligible = true;  
+          referralDoc = doc;  
+          break;  
+        }  
+      }  
+  
+      if (!eligible) {  
+        const earnings = await db.collection("earnings")  
+          .where("userId", "==", userId)  
+          .get();  
+        for (const doc of earnings.docs) {  
+          if ((doc.data().remainingDays || 0) > 0) {  
+            eligible = true;  
+            break;  
+          }  
+        }  
+      }  
+  
+      if (!eligible) {  
+        return message.textContent = "You need active earnings or a valid referral to spin.";  
+      }  
+  
+      // Spin animation and award  
+      wheel.classList.add("spin");  
+      setTimeout(async () => {  
+        const amountWon = 500;  
+  
+        // Update referral as awarded  
+        if (referralDoc) {  
+          await referralDoc.ref.update({ spinStatus: "awarded" });  
+        }  
+  
+        // Save spin  
+        await db.collection("spins").add({  
+          userId,  
+          userName,  
+          roundPassword: inputPassword,  
+          amountWon,  
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()  
+        });  
+  
+        // Update user balance  
+        await db.collection("users").doc(userId).update({  
+          accountBalance: currentBalance + amountWon  
+        });  
+  
+        message.textContent = `🎉 You won ${amountWon} UGX!`;  
+        loadWinners();  
+      }, 1200);  
+    }  
+  
+    async function loadWinners() {  
+      const snapshot = await db.collection("spins").orderBy("timestamp", "desc").limit(10).get();  
+      if (snapshot.empty) {  
+        winnerList.innerHTML = "No winners yet.";  
+        return;  
+      }  
+      winnerList.innerHTML = "";  
+      snapshot.forEach(doc => {  
+        const data = doc.data();  
+        const time = data.timestamp?.toDate().toLocaleString() || "recently";  
+        winnerList.innerHTML += `<p>🎉 ${data.userName} - 500 UGX on ${time}</p>`;  
+      });  
+    }  
+  
+    auth.onAuthStateChanged(user => {  
+      if (user) loadWinners();  
+      else window.location.href = "login.html";  
+    });  
+  </script>  </body>  
+</html>  
