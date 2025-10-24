@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Withdraw - CashPrint</title>
+  <title>Withdraw - Money Printer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -10,202 +10,286 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
   <style>
+    :root {
+      --primary: #1565C0;
+      --primary-dark: #0d47a1;
+      --accent: #FFD54F;
+      --bg: #E3F2FD;
+      --text: #1A1A1A;
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f8f9fa;
+      background: linear-gradient(135deg, var(--bg) 0%, #fff 100%);
       margin: 0;
       padding: 20px;
+      color: var(--text);
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 10px;
-      color: #3f37c9;
+      color: var(--primary);
+      font-size: 24px;
+      margin-bottom: 5px;
+      font-weight: 800;
     }
 
-    p {
+    p.note {
       text-align: center;
-      margin-bottom: 20px;
-      font-weight: bold;
-      color: #1a1a1a;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
+
+    .balance-box {
+      max-width: 480px;
+      margin: 0 auto 20px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 15px;
+      text-align: center;
+      font-weight: 700;
+      color: var(--primary-dark);
     }
 
     form {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-      margin-bottom: 30px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+      max-width: 480px;
+      margin: 0 auto 35px;
     }
 
     input {
       width: 100%;
-      padding: 12px;
+      padding: 14px 15px;
       margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 10px;
       font-size: 15px;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(21,101,192,0.15);
+      outline: none;
     }
 
     button {
-      background: #3f37c9;
-      color: white;
-      padding: 12px;
       width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: #fff;
       border: none;
       border-radius: 10px;
       font-size: 16px;
+      font-weight: 700;
       cursor: pointer;
-      font-weight: bold;
+      transition: 0.3s;
+      box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .error {
+      text-align: center;
+      color: #e53935;
+      font-weight: 600;
+      margin: 10px 0 20px;
     }
 
     .withdrawals-list {
-      background: #ffffff;
+      background: #fff;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.02);
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 480px;
+      margin: 0 auto;
     }
 
     .withdrawals-list h3 {
-      margin-bottom: 15px;
+      color: var(--primary-dark);
       font-size: 18px;
-      color: #3f37c9;
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: 700;
     }
 
     .withdraw-item {
-      background: #f0f0f0;
-      padding: 10px 15px;
+      background: #f5f8fa;
+      padding: 12px 15px;
       border-radius: 10px;
       margin-bottom: 10px;
-      border-left: 4px solid #3f37c9;
+      border-left: 4px solid var(--primary);
     }
 
     .withdraw-item span {
       display: block;
       font-size: 14px;
       color: #333;
+      line-height: 1.5;
     }
 
-    .error {
-      color: red;
+    .footer {
       text-align: center;
-      font-weight: bold;
-      margin-top: -10px;
-      margin-bottom: 20px;
+      color: #777;
+      font-size: 13px;
+      margin-top: 35px;
     }
   </style>
 </head>
 <body>
 
-<h2>Withdraw</h2>
-<p><strong>Note: No withdrawal charges</strong></p>
+  <h2><i class="fa-solid fa-wallet"></i> Withdraw Funds</h2>
+  <p class="note">💸 No withdrawal charges — get your funds instantly!</p>
 
-<form id="withdrawForm">
-  <input type="text" id="phone" placeholder="Receiving Phone" required />
-  <input type="text" id="name" placeholder="Holder's Name" required />
-  <input type="number" id="amount" placeholder="Amount to Withdraw (UGX)" required />
-  <button type="submit">Submit Withdrawal</button>
-</form>
+  <div class="balance-box" id="balanceBox">Fetching balance...</div>
 
-<p class="error" id="error"></p>
+  <form id="withdrawForm">
+    <input type="text" id="phone" placeholder="Receiving Phone (e.g. 07...)" required />
+    <input type="text" id="name" placeholder="Account Holder’s Name" required />
+    <input type="number" id="amount" placeholder="Amount to Withdraw (UGX)" required />
+    <button type="submit"><i class="fa-solid fa-arrow-up-from-bracket"></i> Submit Withdrawal</button>
+  </form>
 
-<div class="withdrawals-list">
-  <h3>Recent Paid Withdrawals</h3>
-  <div id="withdrawalsContainer"></div>
-</div>
+  <p class="error" id="error"></p>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
-    authDomain: "cashprint-c5e72.firebaseapp.com",
-    projectId: "cashprint-c5e72",
-    storageBucket: "cashprint-c5e72.appspot.com",
-    messagingSenderId: "613734624925",
-    appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74"
-  };
+  <div class="withdrawals-list">
+    <h3>Recent Paid Withdrawals</h3>
+    <div id="withdrawalsContainer">Loading...</div>
+  </div>
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+  <div class="footer">
+    © 2025 Money Printer. All rights reserved.
+  </div>
 
-  let currentUser;
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
+      authDomain: "cashprint-c5e72.firebaseapp.com",
+      projectId: "cashprint-c5e72",
+      storageBucket: "cashprint-c5e72.appspot.com",
+      messagingSenderId: "613734624925",
+      appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74"
+    };
 
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      currentUser = user;
-      loadPaidWithdrawals();
-    } else {
-      window.location.href = "login.html";
-    }
-  });
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-  document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const phone = document.getElementById("phone").value.trim();
-    const name = document.getElementById("name").value.trim();
-    const amount = parseInt(document.getElementById("amount").value);
-    const errorDiv = document.getElementById("error");
-    errorDiv.textContent = "";
+    let currentUser;
 
-    if (amount < 5000) {
-      return errorDiv.textContent = "Minimum withdrawal is 5,000 UGX.";
-    }
-
-    const userRef = db.collection("users").doc(currentUser.uid);
-    const userSnap = await userRef.get();
-    const userData = userSnap.data();
-
-    if (!userData || !userData.accountBalance || userData.accountBalance < amount) {
-      return errorDiv.textContent = "Insufficient account balance.";
-    }
-
-    const depositsSnap = await db.collection("deposits")
-      .where("userId", "==", currentUser.uid)
-      .where("status", "==", "approved")
-      .where("amount", ">=", 10000)
-      .get();
-
-    if (depositsSnap.empty) {
-      return errorDiv.textContent = "You must have deposited at least 10,000 UGX to withdraw.";
-    }
-
-    await db.collection("withdrawals").add({
-      phone,
-      name,
-      amount,
-      userId: currentUser.uid,
-      status: "pending",
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        await loadUserBalance();
+        await loadPaidWithdrawals();
+      } else {
+        window.location.href = "login.html";
+      }
     });
 
-    await userRef.update({
-      accountBalance: firebase.firestore.FieldValue.increment(-amount)
+    async function loadUserBalance() {
+      const box = document.getElementById("balanceBox");
+      const userSnap = await db.collection("users").doc(currentUser.uid).get();
+      const data = userSnap.data();
+      if (!data) return box.textContent = "Unable to fetch balance.";
+      box.textContent = `💰 Account Balance: UGX ${data.accountBalance?.toLocaleString() || 0}`;
+    }
+
+    document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const phone = document.getElementById("phone").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const amount = parseInt(document.getElementById("amount").value);
+      const errorDiv = document.getElementById("error");
+      errorDiv.textContent = "";
+
+      if (!phone || !name || !amount) {
+        return errorDiv.textContent = "Please fill in all fields.";
+      }
+
+      if (amount < 5000) {
+        return errorDiv.textContent = "Minimum withdrawal is 5,000 UGX.";
+      }
+
+      const userRef = db.collection("users").doc(currentUser.uid);
+      const userSnap = await userRef.get();
+      const userData = userSnap.data();
+
+      if (!userData || !userData.accountBalance || userData.accountBalance < amount) {
+        return errorDiv.textContent = "Insufficient account balance.";
+      }
+
+      // Check deposit eligibility without index
+      const depositsSnap = await db.collection("deposits")
+        .where("userId", "==", currentUser.uid)
+        .where("status", "==", "approved")
+        .get();
+
+      let hasEligibleDeposit = false;
+      depositsSnap.forEach(d => {
+        if (d.data().amount >= 10000) hasEligibleDeposit = true;
+      });
+
+      if (!hasEligibleDeposit) {
+        return errorDiv.textContent = "You must have deposited at least 10,000 UGX to withdraw.";
+      }
+
+      try {
+        await db.collection("withdrawals").add({
+          phone,
+          name,
+          amount,
+          userId: currentUser.uid,
+          status: "pending",
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        await userRef.update({
+          accountBalance: firebase.firestore.FieldValue.increment(-amount)
+        });
+
+        alert("✅ Withdrawal request submitted successfully.");
+        document.getElementById("withdrawForm").reset();
+        await loadUserBalance();
+      } catch (err) {
+        errorDiv.textContent = "Error submitting withdrawal: " + err.message;
+      }
     });
 
-    alert("Withdrawal request submitted.");
-    document.getElementById("withdrawForm").reset();
-  });
+    async function loadPaidWithdrawals() {
+      const container = document.getElementById("withdrawalsContainer");
+      const snapshot = await db.collection("withdrawals")
+        .where("status", "==", "paid")
+        .get(); // random/default order - no index
 
-  async function loadPaidWithdrawals() {
-    const container = document.getElementById("withdrawalsContainer");
-    const snapshot = await db.collection("withdrawals")
-      .where("status", "==", "paid")
-      .get(); // No orderBy – returns in default/random order
+      if (snapshot.empty) {
+        container.innerHTML = "<p style='text-align:center;color:#666;'>No paid withdrawals yet.</p>";
+        return;
+      }
 
-    container.innerHTML = "";
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const item = document.createElement("div");
-      item.className = "withdraw-item";
-      item.innerHTML = `
-        <span><strong>Phone:</strong> ${data.phone}</span>
-        <span><strong>Amount:</strong> UGX ${data.amount}</span>
-        <span><strong>Status:</strong> Paid</span>
-      `;
-      container.appendChild(item);
-    });
-  }
-</script>
-
+      container.innerHTML = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const item = document.createElement("div");
+        item.className = "withdraw-item";
+        item.innerHTML = `
+          <span><strong>Phone:</strong> ${data.phone}</span>
+          <span><strong>Amount:</strong> UGX ${data.amount.toLocaleString()}</span>
+          <span><strong>Status:</strong> ✅ Paid</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+  </script>
 </body>
 </html>
