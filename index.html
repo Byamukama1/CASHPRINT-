@@ -15,245 +15,176 @@
 
   <style>
     :root{
-      /* Premium fintech palette (blue + soft gold) */
-      --primary:#1565C0;        /* deep royal blue */
-      --primary-d:#0d47a1;
-      --accent:#FFD54F;         /* soft gold */
-      --secondary:#0288d1;      /* info blue */
-      --success:#2E7D32;        /* growth green */
-      --danger:#E53935;         /* alert red */
+      --primary:#1565C0;
+      --primary-dark:#0d47a1;
+      --accent:#FFD54F;
+      --success:#2E7D32;
+      --danger:#E53935;
       --ink:#1A1A1A;
       --muted:#6b7280;
-      --bg1:#E3F2FD;            /* light blue */
+      --bg1:#E3F2FD;
       --bg2:#FFFFFF;
-      --soft:#f5f7fb;
       --radius:14px;
       --shadow:0 10px 25px rgba(0,0,0,.06);
     }
 
     *{box-sizing:border-box;margin:0;padding:0}
     body{
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      color:var(--ink);
+      font-family:'Segoe UI', Roboto, Inter, Arial, sans-serif;
       background:linear-gradient(135deg,var(--bg1) 0%, var(--bg2) 100%);
-      min-height:100dvh;
-      padding:20px;
+      color:var(--ink);
+      min-height:100vh;
+      padding:18px;
     }
-    .container{max-width:1100px;margin:0 auto}
+    .container{max-width:1100px;margin:0 auto;}
 
-    header{
-      display:flex;align-items:center;justify-content:space-between;
-      margin-bottom:18px;
+    header{text-align:center;margin-bottom:20px;}
+    .logo{
+      display:flex;flex-direction:column;align-items:center;gap:4px;
+      background:linear-gradient(135deg,rgba(21,101,192,.12),rgba(255,213,79,.12));
+      border-radius:16px;padding:12px 18px;box-shadow:var(--shadow);
     }
-    .brand{
-      display:flex;align-items:center;gap:12px;
-      padding:10px 14px;border-radius:999px;
-      background:linear-gradient(135deg, rgba(21,101,192,.12), rgba(255,213,79,.18));
+    .logo h1{
+      font-size:22px;font-weight:900;
+      background:linear-gradient(90deg,var(--primary),var(--accent));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    .user-name{
+      font-size:15px;font-weight:700;color:var(--primary-dark);
+      margin-top:2px;
+    }
+    .logout-btn{
+      margin-top:8px;
+      background:none;border:none;color:var(--muted);
+      cursor:pointer;font-size:14px;
+    }
+    .logout-btn:hover{color:var(--primary-dark);}
+
+    /* Summary */
+    .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:18px 0;}
+    .card{
+      background:#fff;border-radius:var(--radius);padding:14px 18px;
       box-shadow:var(--shadow);
     }
-    .brand .logo{
-      width:36px;height:36px;border-radius:10px;
-      display:grid;place-items:center;color:#003; 
-      background:linear-gradient(135deg,#bbdefb,#90caf9);
-      font-size:18px;font-weight:800;
+    .card .title{font-size:12px;color:var(--muted);font-weight:600;}
+    .card .value{
+      font-size:20px;font-weight:800;margin-top:6px;color:var(--primary-dark);
     }
-    .brand h1{
-      font-size:22px;line-height:1.1;font-weight:900;letter-spacing:.2px;
-    }
-    .brand h1 span:first-child{color:var(--primary)}
-    .brand h1 span:last-child{color:var(--accent)}
 
-    .user-tools{display:flex;align-items:center;gap:8px}
-    .user-name{font-weight:700;color:var(--primary);display:none}
-    .logout-btn{
-      border:none;background:transparent;color:var(--muted);cursor:pointer;
-      padding:8px 10px;border-radius:10px;
-    }
-    .logout-btn:hover{color:var(--primary)}
-
-    /* Summary cards */
-    .summary{
-      display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:14px 0 18px;
-    }
-    .card{
-      background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;
-    }
-    .card .title{font-size:13px;color:var(--muted);font-weight:600}
-    .card .value{font-size:28px;font-weight:900;margin-top:6px}
-
-    /* Quick actions */
-    .actions{display:flex;gap:10px;margin:6px 0 18px}
+    /* Actions */
+    .actions{display:flex;gap:10px;margin:10px 0 20px;}
     .action{
-      flex:1;background:#fff;border:none;border-radius:12px;box-shadow:var(--shadow);
-      padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;
-      cursor:pointer;transition:transform .18s ease, box-shadow .18s ease;
-      font-weight:700;
+      flex:1;border:none;border-radius:12px;padding:12px;
+      font-weight:700;cursor:pointer;transition:transform .15s;
+      box-shadow:var(--shadow);
     }
-    .action:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.08)}
-    .action i{font-size:18px}
-    .action.deposit{color:var(--success);background:rgba(46,125,50,.08)}
-    .action.withdraw{color:var(--danger);background:rgba(229,57,53,.08)}
-    .action.invest{color:var(--secondary);background:rgba(2,136,209,.08)}
+    .action:hover{transform:translateY(-2px);}
+    .deposit{background:rgba(46,125,50,.08);color:var(--success);}
+    .withdraw{background:rgba(229,57,53,.08);color:var(--danger);}
+    .invest{background:rgba(21,101,192,.08);color:var(--primary-dark);}
 
-    /* Sections */
-    .section-title{
-      display:flex;align-items:center;gap:8px;font-size:16px;margin-bottom:8px;
+    /* Section panels */
+    .panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px;}
+    .section-title{display:flex;align-items:center;gap:8px;font-size:15px;margin-bottom:10px;color:var(--primary-dark);}
+    .section-title i{color:var(--primary-dark);}
+
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    th,td{padding:10px;border-bottom:1px solid #eef2f7;text-align:center;}
+    th{background:#f6f8fb;font-weight:800;}
+    tbody tr:hover{background:#f9fbff;}
+    .muted{text-align:center;color:var(--muted);padding:10px;}
+
+    /* Referral section */
+    .ref-link-box{
+      display:flex;flex-direction:column;align-items:center;gap:10px;
+      background:#f8fafc;border:1px dashed #cfd8e3;padding:12px;border-radius:10px;word-wrap:break-word;
     }
-    .section-title i{color:var(--primary)}
-
-    .panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
-
-    .table-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    th,td{padding:12px 10px;border-bottom:1px solid #eef2f7;text-align:center}
-    th{background:#f3f6fb;font-weight:800}
-    tbody tr:hover{background:#fafcff}
-    .muted{color:var(--muted);text-align:center;padding:14px}
-
-    .row-highlight{background:rgba(21,101,192,.06);font-weight:700}
-
-    /* Referral */
-    .ref-box{display:flex;gap:10px;flex-wrap:wrap}
     .ref-link{
-      flex:1;min-width:240px;background:#f8fafc;border:1px dashed #cfd8e3;
-      padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;
-      word-break:break-word;font-weight:600
+      font-size:13px;font-weight:600;color:#333;text-align:center;word-break:break-all;
     }
-    .copy{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-weight:800;cursor:pointer}
-    .copy:hover{background:var(--primary-d)}
+    .copy{
+      background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 14px;
+      font-weight:800;cursor:pointer;
+    }
+    .copy:hover{background:var(--primary-dark);}
     .ref-note{
-      background:linear-gradient(135deg, rgba(255,213,79,.25), rgba(21,101,192,.12));
-      border-radius:10px;padding:10px;font-size:13px
+      font-size:12px;color:#333;background:rgba(255,213,79,.18);
+      border-radius:8px;padding:8px;margin-top:10px;text-align:center;
     }
-    .ref-note b{color:var(--success)}
 
     .toast{
-      position:fixed;top:18px;right:18px;background:var(--success);color:#fff;
-      padding:10px 14px;border-radius:10px;transform:translateX(160%);
-      transition:transform .25s ease;z-index:999;font-weight:700;box-shadow:var(--shadow)
+      position:fixed;top:20px;right:18px;
+      background:var(--success);color:#fff;padding:10px 14px;
+      border-radius:8px;box-shadow:var(--shadow);font-weight:700;
+      transform:translateX(160%);transition:transform .25s ease;z-index:99;
     }
-    .toast.show{transform:translateX(0)}
-
-    /* WhatsApp buttons */
-    .wa-btn{
-      display:block;background:#25D366;color:#fff !important;text-decoration:none;
-      padding:12px;text-align:center;border-radius:10px;font-weight:900;box-shadow:var(--shadow);margin:10px 0
-    }
-    .cta-btn{
-      background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 16px;
-      font-weight:900;cursor:pointer;box-shadow:var(--shadow)
-    }
-
-    @media (max-width:768px){
-      .summary{grid-template-columns:1fr}
-    }
+    .toast.show{transform:translateX(0);}
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="brand">
-        <div class="logo">💸</div>
-        <h1><span>Money</span> <span>Printer</span></h1>
-      </div>
-      <div class="user-tools">
-        <div id="userName" class="user-name">Loading…</div>
+      <div class="logo">
+        <h1>💸 Money Printer</h1>
+        <div id="userName" class="user-name">Loading...</div>
         <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </div>
     </header>
 
+    <!-- Summary -->
     <div class="summary">
       <div class="card">
         <div class="title">Account Balance</div>
         <div id="accountBalance" class="value">0 UGX</div>
-        <div class="title" style="margin-top:6px">Available for withdrawal or investment</div>
+        <div class="title">Available for withdrawal or investment</div>
       </div>
       <div class="card">
         <div class="title">Total Withdrawn</div>
         <div id="totalWithdrawn" class="value">0 UGX</div>
-        <div class="title" style="margin-top:6px">Amount successfully paid to you</div>
+        <div class="title">Amount successfully paid to you</div>
       </div>
     </div>
 
+    <!-- Quick Actions -->
     <div class="actions">
-      <button id="depositBtn" class="action deposit"><i class="fa-solid fa-plus-circle"></i><div>Deposit</div></button>
-      <button id="withdrawBtn" class="action withdraw"><i class="fa-solid fa-hand-holding-dollar"></i><div>Withdraw</div></button>
-      <button id="investBtn" class="action invest"><i class="fa-solid fa-chart-line"></i><div>Invest</div></button>
+      <button id="depositBtn" class="action deposit"><i class="fa-solid fa-plus-circle"></i> Deposit</button>
+      <button id="withdrawBtn" class="action withdraw"><i class="fa-solid fa-hand-holding-dollar"></i> Withdraw</button>
+      <button id="investBtn" class="action invest"><i class="fa-solid fa-chart-line"></i> Invest</button>
     </div>
 
     <!-- Earnings -->
     <section class="panel">
       <h2 class="section-title"><i class="fa-solid fa-money-bill-wave"></i> Your Earnings</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Amount Invested</th>
-              <th>Daily Income (1%)</th>
-              <th>Remaining Days (of 365)</th>
-              <th>Total Earned So Far</th>
-            </tr>
-          </thead>
-          <tbody id="earningsList">
-            <tr><td colspan="4" class="muted">Loading earnings…</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Amount Invested</th>
+            <th>Daily Income (1%)</th>
+            <th>Remaining Days (of 365)</th>
+            <th>Total Earned So Far</th>
+          </tr>
+        </thead>
+        <tbody id="earningsList">
+          <tr><td colspan="4" class="muted">Loading earnings…</td></tr>
+        </tbody>
+      </table>
     </section>
 
     <!-- Referral -->
     <section class="panel">
       <h2 class="section-title"><i class="fa-solid fa-share-nodes"></i> Your Referral Link</h2>
-      <div class="ref-box">
-        <div class="ref-link">
-          <span id="linkText">Generating link…</span>
-          <button id="copyBtn" class="copy">Copy</button>
-        </div>
-        <div class="ref-note">
-          <b>Earn 20%</b> of your referral’s first investment. Share your link and grow your earnings.
-        </div>
-      </div>
-    </section>
-
-    <!-- Plans -->
-    <section class="panel">
-      <h2 class="section-title"><i class="fa-solid fa-coins"></i> Investment Plans (1 Year)</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Amount (UGX)</th>
-              <th>Daily Income (1%)</th>
-              <th>Total Earnings (365 days)</th>
-              <th>Days</th>
-            </tr>
-          </thead>
-          <tbody id="investmentPlans"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- WhatsApp & Referrals page -->
-    <div style="max-width:420px;margin:0 auto 18px">
-      <h3 style="text-align:center;margin-bottom:8px">📱 Join Our WhatsApp Groups</h3>
-      <a class="wa-btn" target="_blank" href="https://chat.whatsapp.com/LfOtzwYOfLX6KXKbsAbs07?mode=ac_t">Join Group One</a>
-      <a class="wa-btn" target="_blank" href="https://chat.whatsapp.com/HAvwoHhsrr81tnbnmkXJJ2?mode=ac_t">Join Group Two</a>
-      <button class="cta-btn" onclick="window.location.href='referrals.html'">Click To View All Referrals</button>
-    </div>
-
-    <!-- Referrals who invested -->
-    <section class="panel">
-      <h2 class="section-title"><i class="fa-solid fa-users"></i> Only Referrals Who Invested</h2>
-      <div id="referralList" class="table-wrap">
-        <div class="muted"><i class="fa-solid fa-spinner fa-spin"></i> Loading referrals…</div>
+      <div class="ref-link-box">
+        <div id="referralLink" class="ref-link">Generating link…</div>
+        <button id="copyBtn" class="copy"><i class="fa-regular fa-copy"></i> Copy Link</button>
+        <div class="ref-note"><b>Earn 20%</b> of your referral’s first investment. Share your link and grow your earnings.</div>
       </div>
     </section>
   </div>
 
-  <div id="toast" class="toast">Link copied to clipboard!</div>
+  <div id="toast" class="toast">Link copied!</div>
 
   <script>
-    /* ========= Firebase (same database) ========= */
     const firebaseConfig = {
       apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
       authDomain: "cashprint-c5e72.firebaseapp.com",
@@ -263,247 +194,45 @@
       appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74",
       measurementId: "G-X52TKV2D5J"
     };
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    /* ========= Helpers ========= */
-    const fmt = n => (Number(n)||0).toLocaleString('en-UG', {maximumFractionDigits:0});
     const accountBalanceEl = document.getElementById('accountBalance');
     const totalWithdrawnEl = document.getElementById('totalWithdrawn');
     const userNameEl = document.getElementById('userName');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const depositBtn = document.getElementById('depositBtn');
-    const withdrawBtn = document.getElementById('withdrawBtn');
-    const investBtn = document.getElementById('investBtn');
-    const referralLinkEl = document.getElementById('linkText');
+    const referralLinkEl = document.getElementById('referralLink');
     const copyBtn = document.getElementById('copyBtn');
     const toastEl = document.getElementById('toast');
-    const investmentPlansEl = document.getElementById('investmentPlans');
-    const referralListEl = document.getElementById('referralList');
-    const earningsListEl = document.getElementById('earningsList');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-    const DAILY_RATE = 0.01;         // 1% daily
-    const PLAN_DAYS  = 365;          // 1 year
+    auth.onAuthStateChanged(async (user)=>{
+      if(!user){window.location.href="login.html";return;}
+      const snap = await db.collection("users").doc(user.uid).get();
+      if(!snap.exists)return;
+      const data = snap.data();
+      userNameEl.textContent = data.name || "User";
 
-    let currentUser = null;
-    let userData = null;
+      accountBalanceEl.textContent = (data.accountBalance||0).toLocaleString()+" UGX";
+      totalWithdrawnEl.textContent = (data.totalWithdrawn||0).toLocaleString()+" UGX";
 
-    /* ========= Auth gate ========= */
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) { window.location.href = 'login.html'; return; }
-      currentUser = user;
-      await loadUserData();
-      await loadWithdrawals();
-      await loadReferrals();
-      await loadEarnings();
+      // Use referral code saved in Firestore
+      const base = window.location.origin;
+      const myCode = data.myReferralCode || "REF"+Math.floor(Math.random()*10000);
+      referralLinkEl.textContent = `${base}/signup.html?ref=${myCode}`;
     });
 
-    /* ========= Data loads ========= */
-    async function loadUserData(){
+    copyBtn.addEventListener("click", async()=>{
+      const text = referralLinkEl.textContent;
       try{
-        const snap = await db.collection('users').doc(currentUser.uid).get();
-        if(!snap.exists){ console.warn('User doc missing'); return; }
-        userData = snap.data() || {};
-        if(userData.name){ userNameEl.style.display='block'; userNameEl.textContent = userData.name; }
-        accountBalanceEl.textContent = `${fmt(userData.accountBalance)} UGX`;
-
-        // Referral link: keep same pattern; will adapt to your domain automatically
-        if(userData.phone){
-          const base = window.location.origin;
-          referralLinkEl.textContent = `${base}/signup.html?ref=${encodeURIComponent(userData.phone)}`;
-        }
-
-        generateInvestmentPlans();
-      }catch(e){ console.error('loadUserData', e); }
-    }
-
-    async function loadWithdrawals(){
-      try{
-        const q = await db.collection('withdrawals')
-          .where('userId','==',currentUser.uid)
-          .where('status','==','paid')
-          .get();
-        let total = 0;
-        q.forEach(doc => total += Number(doc.data().amount)||0);
-        totalWithdrawnEl.textContent = `${fmt(total)} UGX`;
-      }catch(e){ console.error('loadWithdrawals', e); }
-    }
-
-    async function loadReferrals(){
-      try{
-        const q = await db.collection('referrals')
-          .where('referrerId','==',currentUser.uid)
-          .orderBy('timestamp','desc')
-          .get();
-
-        if(q.empty){
-          referralListEl.innerHTML = `<div class="muted">You haven’t referred anyone who has invested.</div>`;
-          return;
-        }
-
-        let html = `<table><thead><tr>
-            <th>Referee</th><th>Date</th><th>Bonus</th>
-          </tr></thead><tbody>`;
-        q.forEach(doc=>{
-          const r = doc.data();
-          const d = r.timestamp?.toDate ? r.timestamp.toDate() : new Date();
-          html += `<tr>
-            <td style="font-weight:700">${r.refereeName || 'Unknown User'}</td>
-            <td>${d.toLocaleDateString()}</td>
-            <td style="color:var(--success);font-weight:900">+${fmt(r.bonus)} UGX</td>
-          </tr>`;
-        });
-        html += `</tbody></table>`;
-        referralListEl.innerHTML = html;
-      }catch(e){
-        console.error('loadReferrals', e);
-        referralListEl.innerHTML = `<div class="muted">Error loading referrals.</div>`;
-      }
-    }
-
-    async function loadEarnings(){
-      try{
-        const q = await db.collection('earnings')
-          .where('userId','==',currentUser.uid)
-          .orderBy('timestamp','desc')
-          .get();
-
-        if(q.empty){
-          earningsListEl.innerHTML = `<tr><td colspan="4" class="muted">No earnings yet. Make your first investment to start earning!</td></tr>`;
-          return;
-        }
-
-        earningsListEl.innerHTML = '';
-        q.forEach(doc=>{
-          const e = doc.data();
-          const remaining = Number(e.remainingDays ?? PLAN_DAYS);
-          const daysPassed = Math.max(0, PLAN_DAYS - remaining);
-          const totalEarned = daysPassed * (Number(e.dailyIncome)||0);
-
-          const tr = document.createElement('tr');
-          if(remaining > 0) tr.classList.add('row-highlight');
-          tr.innerHTML = `
-            <td>${fmt(e.amount)} UGX</td>
-            <td>${fmt(e.dailyIncome)} UGX</td>
-            <td>${remaining}</td>
-            <td>${fmt(totalEarned)} UGX</td>
-          `;
-          earningsListEl.appendChild(tr);
-        });
-      }catch(e){
-        console.error('loadEarnings', e);
-        earningsListEl.innerHTML = `<tr><td colspan="4" class="muted">Error loading earnings.</td></tr>`;
-      }
-    }
-
-    /* ========= UI Generators ========= */
-    function generateInvestmentPlans(){
-      investmentPlansEl.innerHTML = '';
-      // Show plans from 10,000 to 500,000 stepping 20,000 (like before)
-      for(let amount = 10000; amount <= 500000; amount += 20000){
-        const daily = Math.round(amount * DAILY_RATE);
-        const total = daily * PLAN_DAYS;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${fmt(amount)}</td>
-          <td>${fmt(daily)}</td>
-          <td>${fmt(total)}</td>
-          <td>${PLAN_DAYS}</td>
-        `;
-        if(userData && Number(userData.accountBalance) === amount){
-          tr.classList.add('row-highlight');
-        }
-        investmentPlansEl.appendChild(tr);
-      }
-    }
-
-    /* ========= Actions ========= */
-    investBtn.addEventListener('click', async ()=>{
-      if(!userData){ alert('User not loaded yet.'); return; }
-      const bal = Number(userData.accountBalance)||0;
-      if(bal < 10000){ alert('Minimum investment amount is 10,000 UGX'); return; }
-
-      try{
-        const investmentAmount = bal;
-        const dailyIncome = Math.round(investmentAmount * DAILY_RATE);
-
-        // Create earnings record (365 days)
-        await db.collection('earnings').add({
-          userId: currentUser.uid,
-          amount: investmentAmount,
-          dailyIncome: dailyIncome,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          remainingDays: PLAN_DAYS
-        });
-
-        // Reset balance
-        await db.collection('users').doc(currentUser.uid).update({ accountBalance: 0 });
-
-        // Referral 20% first-investment bonus (same logic)
-        if(userData.referrerPhone){
-          const refSnap = await db.collection('users')
-            .where('phone','==', userData.referrerPhone)
-            .limit(1).get();
-
-          if(!refSnap.empty){
-            const refDoc = refSnap.docs[0];
-            const refData = refDoc.data() || {};
-            const refId = refDoc.id;
-
-            // Award only once per referee
-            const exists = await db.collection('referrals')
-              .where('referrerId','==',refId)
-              .where('refereeId','==',currentUser.uid)
-              .limit(1).get();
-
-            if(exists.empty){
-              const bonus = Math.round(investmentAmount * 0.20);
-              await db.collection('users').doc(refId).update({
-                accountBalance: (Number(refData.accountBalance)||0) + bonus
-              });
-              await db.collection('referrals').add({
-                referrerId: refId,
-                refereeId: currentUser.uid,
-                refereeName: userData.name || '',
-                bonus: bonus,
-                referrerEarned: bonus,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-              });
-            }
-          }
-        }
-
-        // Update UI
-        userData.accountBalance = 0;
-        accountBalanceEl.textContent = `0 UGX`;
-        generateInvestmentPlans();
-        await loadEarnings();
-        alert(`Successfully invested ${fmt(investmentAmount)} UGX! Your 1% daily income starts accruing from tomorrow.`);
-      }catch(e){
-        console.error('investment', e);
-        alert('Investment failed. Please try again.');
-      }
+        await navigator.clipboard.writeText(text);
+        toastEl.classList.add("show");
+        setTimeout(()=>toastEl.classList.remove("show"),2000);
+      }catch(e){alert("Copy failed. Copy manually.");}
     });
 
-    copyBtn.addEventListener('click', async ()=>{
-      const text = referralLinkEl.textContent || '';
-      try{
-        if(navigator.clipboard && window.isSecureContext){
-          await navigator.clipboard.writeText(text);
-        }else{
-          const ta = document.createElement('textarea');
-          ta.value = text; document.body.appendChild(ta); ta.select();
-          document.execCommand('copy'); document.body.removeChild(ta);
-        }
-        toastEl.classList.add('show');
-        setTimeout(()=>toastEl.classList.remove('show'), 2200);
-      }catch(e){ console.error('copy', e); }
-    });
-
-    depositBtn.addEventListener('click', ()=> window.location.href='deposit.html');
-    withdrawBtn.addEventListener('click', ()=> window.location.href='withdraw.html');
-    logoutBtn.addEventListener('click', ()=> auth.signOut().then(()=> window.location.href='login.html'));
+    logoutBtn.addEventListener("click", ()=>auth.signOut().then(()=>window.location.href="login.html"));
   </script>
 </body>
 </html>
