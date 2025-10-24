@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CashPrint - Deposit</title>
+  <title>Money Printer - Deposit</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -11,101 +11,135 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f8f9fa;
+      background: linear-gradient(135deg, #E3F2FD 0%, #FFFFFF 100%);
       margin: 0;
       padding: 20px;
-      color: #333;
+      color: #1A1A1A;
     }
     .container {
       max-width: 500px;
       margin: auto;
       background: #fff;
       padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
       position: relative;
     }
     h2 {
       text-align: center;
+      color: #1565C0;
       margin-bottom: 20px;
+      font-weight: 800;
     }
     .info-box, .history-box {
-      background: #f1f1f1;
+      background: #f8fafc;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 10px;
       margin-bottom: 15px;
+      border: 1px solid #e0e6ef;
     }
     .info-box strong {
-      color: #d35400;
+      color: #1565C0;
     }
     input {
       width: 100%;
       padding: 12px;
       margin-bottom: 15px;
-      border: 1px solid #ccc;
+      border: 1px solid #cfd8dc;
       border-radius: 8px;
+      font-size: 15px;
     }
     button {
       width: 100%;
       padding: 12px;
-      background: #d35400;
+      background: #1565C0;
       color: #fff;
       border: none;
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
+      font-size: 15px;
+      box-shadow: 0 3px 8px rgba(21,101,192,0.3);
+    }
+    button:hover {
+      background: #0d47a1;
     }
     .cancel-btn {
-      background: #e74c3c;
+      background: #E53935;
       margin-top: 10px;
     }
-    .help-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 18px;
-      background: none;
+    .copy-btn {
+      background: #FFD54F;
+      color: #000;
       border: none;
-      color: #3498db;
-      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 13px;
       cursor: pointer;
+      margin-left: 5px;
     }
-    .help-btn i {
-      margin-right: 5px;
-      font-size: 30px;
+    .copy-btn:hover {
+      background: #ffca28;
+    }
+    .hidden {
+      display: none;
+    }
+    .help-text {
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>Deposit to CashPrint</h2>
+    <h2>Deposit to Money Printer</h2>
 
-    <div class="info-box">
-      <p><strong>No deposit charges.</strong></p>
-
-      <p>📲 <strong>MTN Users:</strong> Dial <strong>*165#</strong> and send money to the numbers below.</p>
-      <p>📲 <strong>Airtel Users:</strong> Dial <strong>*185#</strong> and send money to the numbers below.</p>
-
-      
-      <p><strong>Airtel:</strong> <span id="copyPhone1">0702940898</span> <button onclick="copyText('0702940898')">Copy</button></p>
-      <p><strong>MTN:</strong> <span id="copyPhone2">0791884275</span> <button onclick="copyText('0791884275')">Copy</button></p>
-      <p><strong>Name:</strong> Akampurira Richard</p>
+    <!-- Step 1: Deposit Form -->
+    <div id="depositFormSection">
+      <div class="help-text">Fill in the details below to begin your deposit 👇</div>
+      <input type="text" id="senderName" placeholder="Your Full Name" required />
+      <input type="text" id="senderPhone" placeholder="Depositing Phone Number" required />
+      <input type="number" id="amount" placeholder="Amount to Deposit" required />
+      <button onclick="createDeposit()">Continue</button>
     </div>
-    <div>After sending money fill the following and submit </div>
 
-    <input type="text" id="senderPhone" placeholder="Your Depositing Phone Number" required />
-    <input type="text" id="senderName" placeholder="Your Depositor's Name" required />
-    <input type="number" id="amount" placeholder="Enter amount You deposited" />
-    <button onclick="submitDeposit()">Submit Deposit</button>
+    <!-- Step 2: Payment Instructions -->
+    <div id="paymentSection" class="hidden">
+      <div class="info-box">
+        <h3 style="text-align:center;color:#1565C0;margin-top:0;">Payment Instructions</h3>
+        <p><strong>No deposit charges.</strong></p>
 
+        <p>📲 <strong>MTN Users:</strong> Dial <strong>*165#</strong> and send money to the numbers below.</p>
+        <p>📲 <strong>Airtel Users:</strong> Dial <strong>*185#</strong> and send money to the numbers below.</p>
+
+        <p><strong>Airtel:</strong> <span id="copyPhone1">0743681312</span> 
+          <button class="copy-btn" onclick="copyText('0743681312')">Copy</button></p>
+
+        <p><strong>MTN:</strong> <span id="copyPhone2">0780256063</span> 
+          <button class="copy-btn" onclick="copyText('0780256063')">Copy</button></p>
+
+        <p><strong>Name:</strong> Agaba John</p>
+
+        <p style="margin-top:15px;font-size:14px;">
+          After sending, wait for confirmation. The team will approve and your deposit will reflect automatically.
+        </p>
+
+        <button style="background:#1565C0;margin-top:15px;" onclick="backToForm()">← Back</button>
+      </div>
+    </div>
+
+    <!-- Deposit History -->
     <div class="history-box">
-      <h4>Deposit History</h4>
+      <h4 style="margin-top:0;color:#1565C0;">Deposit History</h4>
       <div id="depositHistory">Loading...</div>
     </div>
   </div>
 
   <script>
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
       authDomain: "cashprint-c5e72.firebaseapp.com",
@@ -115,42 +149,49 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    function copyText(text) {
-      navigator.clipboard.writeText(text);
-      alert("Phone number copied!");
-    }
-
-    auth.onAuthStateChanged(async user => {
+    auth.onAuthStateChanged(user => {
       if (!user) return (window.location.href = "login.html");
-      const uid = user.uid;
-      loadDeposits(uid);
+      loadDeposits(user.uid);
     });
 
-    async function submitDeposit() {
-      const user = firebase.auth().currentUser;
-      const amount = parseInt(document.getElementById("amount").value);
-      const senderPhone = document.getElementById("senderPhone").value.trim();
-      const senderName = document.getElementById("senderName").value.trim();
-      if (!senderPhone || !senderName) return alert("Please enter depositing phone and name.");
-      if (isNaN(amount) || amount <= 0) return alert("Enter valid amount");
+    function copyText(text) {
+      navigator.clipboard.writeText(text);
+      alert("Phone number copied to clipboard!");
+    }
 
-      const snapshot = await db.collection("deposits").where("userId", "==", user.uid).where("status", "==", "pending").get();
-      if (!snapshot.empty) return alert("You already have a pending deposit. Cancel or complete it before submitting a new one.");
+    async function createDeposit() {
+      const user = firebase.auth().currentUser;
+      const senderName = document.getElementById("senderName").value.trim();
+      const senderPhone = document.getElementById("senderPhone").value.trim();
+      const amount = parseInt(document.getElementById("amount").value);
+
+      if (!senderName || !senderPhone || isNaN(amount) || amount <= 0)
+        return alert("Please fill in all fields correctly.");
+
+      const pending = await db.collection("deposits")
+        .where("userId", "==", user.uid)
+        .where("status", "==", "pending").get();
+      if (!pending.empty)
+        return alert("You already have a pending deposit. Wait for it to be approved before creating another.");
 
       await db.collection("deposits").add({
         userId: user.uid,
-        senderPhone,
         senderName,
+        senderPhone,
         amount,
         status: "pending",
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       });
 
-      alert("Deposit submitted! Will reflect in under 5 minutes.");
-      document.getElementById("amount").value = "";
-      document.getElementById("senderPhone").value = "";
-      document.getElementById("senderName").value = "";
+      alert("Deposit record created successfully. Now send money using the details below.");
+      document.getElementById("depositFormSection").classList.add("hidden");
+      document.getElementById("paymentSection").classList.remove("hidden");
       loadDeposits(user.uid);
+    }
+
+    function backToForm() {
+      document.getElementById("paymentSection").classList.add("hidden");
+      document.getElementById("depositFormSection").classList.remove("hidden");
     }
 
     async function cancelDeposit(docId) {
@@ -162,12 +203,15 @@
     async function loadDeposits(uid) {
       const history = document.getElementById("depositHistory");
       history.innerHTML = "";
-      const snapshot = await db.collection("deposits").where("userId", "==", uid).get();
+      const snapshot = await db.collection("deposits")
+        .where("userId", "==", uid)
+        .orderBy("timestamp", "desc").get();
       if (snapshot.empty) return (history.textContent = "No deposits yet.");
 
       snapshot.forEach(doc => {
         const d = doc.data();
         const div = document.createElement("div");
+        div.style.marginBottom = "10px";
         div.innerHTML = `
           <strong>${d.amount} UGX</strong> - ${d.status.toUpperCase()}
           ${d.status === "pending" ? `<button class='cancel-btn' onclick='cancelDeposit("${doc.id}")'>Cancel</button>` : ""}
