@@ -2,140 +2,141 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Login - CashPrint</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Money Printer - Login</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <style>
+    :root {
+      --primary: #1565C0;
+      --primary-dark: #0d47a1;
+      --accent: #FFD54F;
+      --bg-light: #E3F2FD;
+      --text-dark: #1A1A1A;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, var(--bg-light) 0%, #FFFFFF 100%);
       margin: 0;
-      padding: 0;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      color: var(--text-dark);
     }
 
     .container {
+      background: #fff;
+      padding: 35px 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       max-width: 420px;
       width: 90%;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      padding: 35px 30px;
-      position: relative;
     }
 
     .logo {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     .logo h1 {
-      color: #d35400;
-      font-size: 28px;
       margin: 0;
-      font-weight: 800;
-      letter-spacing: -0.5px;
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--primary);
     }
 
     .logo span {
-      color: #3498db;
+      color: var(--accent);
     }
 
     .welcome-message {
       text-align: center;
-      color: #2c3e50;
-      font-size: 18px;
-      margin: 15px 0 25px;
-      line-height: 1.5;
+      color: #555;
+      font-size: 16px;
+      margin-bottom: 25px;
     }
 
     h2 {
       text-align: center;
-      color: #2c3e50;
-      margin: 15px 0 25px;
-      font-weight: 600;
-      font-size: 24px;
+      color: var(--primary);
+      margin-bottom: 25px;
+      font-weight: 700;
     }
 
     input {
       width: 100%;
       padding: 14px 15px;
-      margin: 12px 0;
-      font-size: 16px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      border: 1px solid #ddd;
-      box-sizing: border-box;
-      transition: all 0.3s;
+      font-size: 15px;
+      transition: all 0.3s ease;
     }
 
     input:focus {
-      border-color: #3498db;
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.2);
       outline: none;
     }
 
     button {
       width: 100%;
       padding: 15px;
-      margin: 20px 0 15px;
-      font-size: 17px;
-      border-radius: 8px;
+      margin-top: 18px;
+      background: var(--primary);
+      color: #fff;
       border: none;
-      font-weight: 600;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 17px;
       cursor: pointer;
-      transition: all 0.3s;
-      background: linear-gradient(to right, #e67e22, #d35400);
-      color: white;
-      box-shadow: 0 4px 15px rgba(211, 84, 0, 0.2);
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(21, 101, 192, 0.3);
     }
 
     button:hover {
-      background: linear-gradient(to right, #d35400, #e67e22);
+      background: var(--primary-dark);
       transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(211, 84, 0, 0.25);
     }
 
     .signup-link {
       text-align: center;
       margin-top: 20px;
-      color: #7f8c8d;
-      font-size: 16px;
+      color: #555;
+      font-size: 15px;
     }
 
     .signup-link a {
-      color: #3498db;
+      color: var(--primary);
+      font-weight: bold;
       text-decoration: none;
-      font-weight: 600;
-      transition: color 0.3s;
     }
 
     .signup-link a:hover {
-      color: #2980b9;
       text-decoration: underline;
     }
 
     .footer {
       text-align: center;
       margin-top: 25px;
-      color: #95a5a6;
       font-size: 14px;
-      padding-top: 15px;
+      color: #777;
       border-top: 1px solid #eee;
+      padding-top: 15px;
     }
 
     .error-message {
-      color: #e74c3c;
-      background: #fdeded;
-      padding: 10px 15px;
+      background: #fdecea;
+      color: #e53935;
       border-radius: 8px;
-      margin: 10px 0;
+      padding: 10px 15px;
+      font-size: 14px;
+      margin-bottom: 10px;
       display: none;
-      font-size: 15px;
     }
 
     .password-container {
@@ -148,19 +149,19 @@
       top: 50%;
       transform: translateY(-50%);
       cursor: pointer;
-      color: #7f8c8d;
       font-size: 14px;
+      color: #777;
     }
 
     .forgot-password {
       text-align: right;
-      margin: 5px 0 15px;
+      margin-top: 5px;
     }
 
     .forgot-password a {
-      color: #3498db;
-      text-decoration: none;
       font-size: 14px;
+      color: var(--primary);
+      text-decoration: none;
     }
 
     .forgot-password a:hover {
@@ -168,50 +169,46 @@
     }
   </style>
 </head>
-<body>
 
+<body>
   <div class="container">
-    <!-- CashPrint Logo -->
     <div class="logo">
-      <h1>Cash<span>Print</span></h1>
+      <h1>Money<span>Printer</span></h1>
     </div>
-    
+
     <div class="welcome-message">
-      Welcome back to your financial journey
+      Welcome back! Continue your journey to financial growth 🚀
     </div>
-    
+
     <h2>Login to Your Account</h2>
-    
+
     <form id="loginForm">
       <div id="loginError" class="error-message"></div>
-      
+
       <input type="email" id="loginEmail" placeholder="Email Address" required />
-      
+
       <div class="password-container">
         <input type="password" id="loginPassword" placeholder="Password" required />
         <span class="toggle-password" onclick="togglePassword()">Show</span>
       </div>
-      
+
       <div class="forgot-password">
         <a href="#" onclick="forgotPassword()">Forgot Password?</a>
       </div>
-      
+
       <button type="submit">Login</button>
     </form>
-    
-    <!-- Sign Up Link -->
+
     <div class="signup-link">
-      Don't have an account? <a href="signup.html">Sign Up</a>
+      Don’t have an account? <a href="signup.html">Sign Up</a>
     </div>
-    
-    <!-- Footer -->
+
     <div class="footer">
-      &copy; 2023 CashPrint. All rights reserved.
+      &copy; 2025 Money Printer. All rights reserved.
     </div>
   </div>
 
   <script>
-    // Firebase config (same as signup page)
     const firebaseConfig = {
       apiKey: "AIzaSyDIP5I-yG0skjsva9B3p-pMshPuq4odFU8",
       authDomain: "cashprint-c5e72.firebaseapp.com",
@@ -224,59 +221,45 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
 
-    // Login functionality
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    const loginForm = document.getElementById("loginForm");
+    const errorBox = document.getElementById("loginError");
+
+    loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const errorElement = document.getElementById('loginError');
-      
-      errorElement.style.display = 'none';
-      
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      errorBox.style.display = "none";
       try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-        
-        // Redirect to dashboard after successful login
+        await auth.signInWithEmailAndPassword(email, password);
         window.location.href = "index.html";
-      } catch (error) {
-        errorElement.textContent = "Login failed: " + error.message;
-        errorElement.style.display = 'block';
+      } catch (err) {
+        errorBox.textContent = "⚠️ " + (err.message || "Login failed.");
+        errorBox.style.display = "block";
       }
     });
-    
-    // Toggle password visibility
+
     function togglePassword() {
-      const passwordInput = document.getElementById('loginPassword');
-      const toggleButton = document.querySelector('.toggle-password');
-      
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleButton.textContent = 'Hide';
+      const input = document.getElementById("loginPassword");
+      const toggle = document.querySelector(".toggle-password");
+      if (input.type === "password") {
+        input.type = "text";
+        toggle.textContent = "Hide";
       } else {
-        passwordInput.type = 'password';
-        toggleButton.textContent = 'Show';
+        input.type = "password";
+        toggle.textContent = "Show";
       }
     }
-    
-    // Forgot password functionality
+
     function forgotPassword() {
-      const email = prompt("Please enter your email address:");
-      
+      const email = prompt("Enter your registered email to reset password:");
       if (email) {
         auth.sendPasswordResetEmail(email)
-          .then(() => {
-            alert("Password reset email sent. Please check your inbox.");
-          })
-          .catch(error => {
-            alert("Error sending reset email: " + error.message);
-          });
+          .then(() => alert("✅ Password reset link sent. Check your inbox."))
+          .catch(err => alert("Error: " + err.message));
       }
     }
   </script>
-
 </body>
 </html>
