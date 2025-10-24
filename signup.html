@@ -2,31 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Sign Up - CashPrint</title>
+  <title>Sign Up - Money Printer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <style>
+    :root {
+      --primary: #1565C0;
+      --primary-dark: #0d47a1;
+      --accent: #FFD54F;
+      --bg-light: #E3F2FD;
+      --text-dark: #1A1A1A;
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      background: linear-gradient(135deg, var(--bg-light) 0%, #ffffff 100%);
       margin: 0;
       padding: 0;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      color: var(--text-dark);
     }
 
     .container {
       max-width: 420px;
       width: 90%;
-      background: white;
+      background: #fff;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       padding: 35px 30px;
-      position: relative;
     }
 
     .logo {
@@ -35,121 +44,116 @@
     }
 
     .logo h1 {
-      color: #d35400;
-      font-size: 28px;
+      color: var(--primary);
+      font-size: 30px;
       margin: 0;
-      font-weight: 800;
-      letter-spacing: -0.5px;
+      font-weight: 900;
     }
 
     .logo span {
-      color: #3498db;
-    }
-
-    .bonus-note {
-      text-align: center;
-      background: #eaf7ff;
-      padding: 10px;
-      border-radius: 8px;
-      margin: 15px 0;
-      font-size: 15px;
-      color: #2c3e50;
-    }
-
-    .bonus-note strong {
-      color: #27ae60;
+      color: var(--accent);
     }
 
     h2 {
       text-align: center;
-      color: #2c3e50;
+      color: var(--primary);
       margin: 15px 0 25px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 24px;
+    }
+
+    .bonus-note {
+      text-align: center;
+      background: rgba(21,101,192,0.08);
+      padding: 12px;
+      border-radius: 8px;
+      margin: 10px 0 20px;
+      color: var(--primary-dark);
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .bonus-note strong {
+      color: #2e7d32;
     }
 
     input {
       width: 100%;
       padding: 14px 15px;
-      margin: 12px 0;
+      margin: 10px 0;
       font-size: 16px;
       border-radius: 8px;
-      border: 1px solid #ddd;
-      box-sizing: border-box;
-      transition: all 0.3s;
+      border: 1px solid #ccc;
+      transition: all 0.3s ease;
     }
 
     input:focus {
-      border-color: #3498db;
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(21,101,192,0.2);
       outline: none;
     }
 
     button {
       width: 100%;
       padding: 15px;
-      margin: 20px 0 15px;
+      margin-top: 18px;
       font-size: 17px;
       border-radius: 8px;
       border: none;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: background 0.3s;
-      background: linear-gradient(to right, #e67e22, #d35400);
+      background: var(--primary);
       color: white;
-      box-shadow: 0 4px 15px rgba(211, 84, 0, 0.2);
+      box-shadow: 0 5px 15px rgba(21, 101, 192, 0.3);
+      transition: all 0.3s ease;
     }
 
     button:hover {
-      background: linear-gradient(to right, #d35400, #e67e22);
+      background: var(--primary-dark);
       transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(211, 84, 0, 0.25);
     }
 
     .login-link {
       text-align: center;
       margin-top: 20px;
-      color: #7f8c8d;
-      font-size: 16px;
+      color: #555;
+      font-size: 15px;
     }
 
     .login-link a {
-      color: #3498db;
+      color: var(--primary);
       text-decoration: none;
-      font-weight: 600;
-      transition: color 0.3s;
+      font-weight: bold;
     }
 
     .login-link a:hover {
-      color: #2980b9;
       text-decoration: underline;
     }
 
     .footer {
       text-align: center;
       margin-top: 25px;
-      color: #95a5a6;
-      font-size: 14px;
-      padding-top: 15px;
+      color: #777;
+      font-size: 13px;
       border-top: 1px solid #eee;
+      padding-top: 15px;
     }
   </style>
 </head>
-<body>
 
+<body>
   <div class="container">
-    <!-- CashPrint Logo -->
+    <!-- Logo -->
     <div class="logo">
-      <h1>Cash<span>Print</span></h1>
+      <h1>Money<span>Printer</span></h1>
     </div>
-    
+
     <h2>Create Your Account</h2>
-    
-    <!-- Bonus Note -->
+
     <div class="bonus-note">
-      Sign up now and get <strong>2000 UGX</strong> welcome bonus!
+      🎉 Sign up now and instantly receive a <strong>UGX 2,000</strong> welcome bonus!
     </div>
-    
+
     <form id="signupForm">
       <input type="text" id="name" placeholder="Full Name" required />
       <input type="email" id="email" placeholder="Email Address" required />
@@ -157,15 +161,13 @@
       <input type="password" id="password" placeholder="Password" required />
       <button type="submit">Sign Up</button>
     </form>
-    
-    <!-- Login Link -->
+
     <div class="login-link">
       Already have an account? <a href="login.html">Login</a>
     </div>
-    
-    <!-- Footer -->
+
     <div class="footer">
-      &copy; 2023 CashPrint. All rights reserved.
+      © 2025 Money Printer · All rights reserved.
     </div>
   </div>
 
@@ -185,38 +187,47 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Get referrer from URL
+    // Get referrer phone from URL (if any)
     const urlParams = new URLSearchParams(window.location.search);
-    const referrerPhone = urlParams.get('ref') || "";
+    const referrerPhone = urlParams.get("ref") || "";
 
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const password = document.getElementById('password').value;
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!name || !email || !phone || !password) {
+        alert("Please fill in all fields.");
+        return;
+      }
 
       try {
+        // Create Firebase Auth account
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
+        // Save user data in Firestore
         await db.collection("users").doc(user.uid).set({
           userId: user.uid,
-          name: name,
-          email: email,
-          phone: phone,
-          referrerPhone: referrerPhone,
-          accountBalance: 2000
+          name,
+          email,
+          phone,
+          referrerPhone,
+          accountBalance: 2000,
+          totalEarnings: 2000,
+          referralCount: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        alert("Account created! Welcome bonus of 2000 UGX awarded.");
+        alert("🎉 Account created successfully! You've received a 2,000 UGX welcome bonus.");
         window.location.href = "login.html";
-      } catch (error) {
-        alert("Signup failed: " + error.message);
+      } catch (err) {
+        alert("Signup failed: " + err.message);
       }
     });
   </script>
-
 </body>
 </html>
