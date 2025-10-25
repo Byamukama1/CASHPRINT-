@@ -1,43 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard – Money Printer</title>
 
-  <!-- Firebase v9 compat -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
     :root{
-      --primary:#1565C0;
-      --primary-dark:#0d47a1;
-      --accent:#FFD54F;
-      --success:#2E7D32;
-      --danger:#E53935;
-      --ink:#1A1A1A;
-      --muted:#6b7280;
-      --bg1:#E3F2FD;
-      --bg2:#FFFFFF;
-      --radius:14px;
-      --shadow:0 10px 25px rgba(0,0,0,.06);
+      --primary:#1565C0; --primary-dark:#0d47a1;
+      --accent:#FFD54F; --success:#2E7D32; --danger:#E53935;
+      --ink:#1A1A1A; --muted:#6b7280;
+      --bg1:#E3F2FD; --bg2:#FFFFFF;
+      --radius:14px; --shadow:0 10px 25px rgba(0,0,0,.06);
     }
-
     *{box-sizing:border-box;margin:0;padding:0}
     body{
-      font-family:'Segoe UI', Roboto, Inter, Arial, sans-serif;
-      background:linear-gradient(135deg,var(--bg1) 0%, var(--bg2) 100%);
-      color:var(--ink);
-      min-height:100vh;
-      padding:18px;
+      font-family:'Segoe UI',Roboto,Inter,Arial,sans-serif;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:var(--ink);min-height:100vh;padding:18px;
     }
     .container{max-width:1100px;margin:0 auto;}
-
     header{text-align:center;margin-bottom:20px;}
     .logo{
       display:flex;flex-direction:column;align-items:center;gap:4px;
@@ -47,71 +35,40 @@
     .logo h1{
       font-size:22px;font-weight:900;
       background:linear-gradient(90deg,var(--primary),var(--accent));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     }
-    .user-name{
-      font-size:15px;font-weight:700;color:var(--primary-dark);
-      margin-top:2px;
-    }
-    .logout-btn{
-      margin-top:8px;
-      background:none;border:none;color:var(--muted);
-      cursor:pointer;font-size:14px;
-    }
+    .user-name{font-size:15px;font-weight:700;color:var(--primary-dark);margin-top:2px;}
+    .logout-btn{margin-top:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;}
     .logout-btn:hover{color:var(--primary-dark);}
 
-    /* Summary */
     .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:18px 0;}
-    .card{
-      background:#fff;border-radius:var(--radius);padding:14px 18px;
-      box-shadow:var(--shadow);
-    }
+    .card{background:#fff;border-radius:var(--radius);padding:14px 18px;box-shadow:var(--shadow);}
     .card .title{font-size:12px;color:var(--muted);font-weight:600;}
-    .card .value{
-      font-size:20px;font-weight:800;margin-top:6px;color:var(--primary-dark);
-    }
+    .card .value{font-size:20px;font-weight:800;margin-top:6px;color:var(--primary-dark);}
 
-    /* Actions */
     .actions{display:flex;gap:10px;margin:10px 0 20px;}
-    .action{
-      flex:1;border:none;border-radius:12px;padding:12px;
-      font-weight:700;cursor:pointer;transition:transform .15s;
-      box-shadow:var(--shadow);
-    }
+    .action{flex:1;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;transition:transform .15s;box-shadow:var(--shadow);}
     .action:hover{transform:translateY(-2px);}
     .deposit{background:rgba(46,125,50,.08);color:var(--success);}
     .withdraw{background:rgba(229,57,53,.08);color:var(--danger);}
-    .invest{background:rgba(21,101,192,.08);color:var(--primary-dark);}
 
-    /* Section panels */
     .panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px;}
     .section-title{display:flex;align-items:center;gap:8px;font-size:15px;margin-bottom:10px;color:var(--primary-dark);}
     .section-title i{color:var(--primary-dark);}
-
     table{width:100%;border-collapse:collapse;font-size:13px;}
     th,td{padding:10px;border-bottom:1px solid #eef2f7;text-align:center;}
     th{background:#f6f8fb;font-weight:800;}
     tbody tr:hover{background:#f9fbff;}
     .muted{text-align:center;color:var(--muted);padding:10px;}
 
-    /* Referral section */
     .ref-link-box{
       display:flex;flex-direction:column;align-items:center;gap:10px;
       background:#f8fafc;border:1px dashed #cfd8e3;padding:12px;border-radius:10px;word-wrap:break-word;
     }
-    .ref-link{
-      font-size:13px;font-weight:600;color:#333;text-align:center;word-break:break-all;
-    }
-    .copy{
-      background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 14px;
-      font-weight:800;cursor:pointer;
-    }
+    .ref-link{font-size:13px;font-weight:600;color:#333;text-align:center;word-break:break-all;}
+    .copy{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:800;cursor:pointer;}
     .copy:hover{background:var(--primary-dark);}
-    .ref-note{
-      font-size:12px;color:#333;background:rgba(255,213,79,.18);
-      border-radius:8px;padding:8px;margin-top:10px;text-align:center;
-    }
+    .ref-note{font-size:12px;color:#333;background:rgba(255,213,79,.18);border-radius:8px;padding:8px;margin-top:10px;text-align:center;}
 
     .toast{
       position:fixed;top:20px;right:18px;
@@ -120,8 +77,20 @@
       transform:translateX(160%);transition:transform .25s ease;z-index:99;
     }
     .toast.show{transform:translateX(0);}
+
+    .whatsapp-section{margin-top:16px;text-align:center;}
+    .whatsapp-section h3{color:var(--primary-dark);margin-bottom:10px;}
+    .whatsapp-link{
+      display:block;width:100%;max-width:280px;margin:8px auto;
+      background:#25D366;color:#fff;padding:10px;border-radius:8px;
+      text-decoration:none;font-weight:700;
+    }
+
+    .referrals-section{margin-top:18px;}
+    .referrals-section table{margin-top:10px;}
   </style>
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -144,24 +113,28 @@
         <div id="totalWithdrawn" class="value">0 UGX</div>
         <div class="title">Amount successfully paid to you</div>
       </div>
+      <div class="card">
+        <div class="title">Total Earnings</div>
+        <div id="totalEarnings" class="value">0 UGX</div>
+        <div class="title">All earnings from investments</div>
+      </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="actions">
       <button id="depositBtn" class="action deposit"><i class="fa-solid fa-plus-circle"></i> Deposit</button>
       <button id="withdrawBtn" class="action withdraw"><i class="fa-solid fa-hand-holding-dollar"></i> Withdraw</button>
-      <button id="investBtn" class="action invest"><i class="fa-solid fa-chart-line"></i> Invest</button>
     </div>
 
-    <!-- Earnings -->
+    <!-- Active Earnings -->
     <section class="panel">
-      <h2 class="section-title"><i class="fa-solid fa-money-bill-wave"></i> Your Earnings</h2>
+      <h2 class="section-title"><i class="fa-solid fa-money-bill-wave"></i> Your Active Investments</h2>
       <table>
         <thead>
           <tr>
             <th>Amount Invested</th>
             <th>Daily Income (10%)</th>
-            <th>Remaining Days (of 365)</th>
+            <th>Remaining Days</th>
             <th>Total Earned So Far</th>
           </tr>
         </thead>
@@ -169,6 +142,30 @@
           <tr><td colspan="4" class="muted">Loading earnings…</td></tr>
         </tbody>
       </table>
+
+      <!-- WhatsApp Section -->
+      <div class="whatsapp-section">
+        <h3>📱 Join Our WhatsApp Groups</h3>
+        <a href="https://chat.whatsapp.com/JCuAGHej7pHDi8bCK0Hy4p?mode=wwc" class="whatsapp-link">Join Group One</a>
+      
+      </div>
+
+      <!-- Referrals who invested -->
+      <div class="referrals-section">
+        <h3 class="section-title"><i class="fa-solid fa-users"></i> Your Referrals Who Invested</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>First Investment (UGX)</th>
+              <th>Your Bonus (10%)</th>
+            </tr>
+          </thead>
+          <tbody id="referralsList">
+            <tr><td colspan="3" class="muted">Loading referrals…</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- Referral -->
@@ -179,6 +176,17 @@
         <button id="copyBtn" class="copy"><i class="fa-regular fa-copy"></i> Copy Link</button>
         <div class="ref-note"><b>Earn 10%</b> of your referral’s first investment. Share your link and grow your earnings.</div>
       </div>
+    </section>
+
+    <!-- Investment Plans -->
+    <section class="panel">
+      <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Investment Plans</h2>
+      <table>
+        <thead>
+          <tr><th>Amount (UGX)</th><th>Daily Income (10%)</th><th>Total Earnings</th><th>Days</th></tr>
+        </thead>
+        <tbody id="plans"></tbody>
+      </table>
     </section>
   </div>
 
@@ -194,45 +202,109 @@
       appId: "1:613734624925:web:d6bc8a18b3b6cb3a31ae74",
       measurementId: "G-X52TKV2D5J"
     };
-
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const auth=firebase.auth();
+    const db=firebase.firestore();
 
-    const accountBalanceEl = document.getElementById('accountBalance');
-    const totalWithdrawnEl = document.getElementById('totalWithdrawn');
-    const userNameEl = document.getElementById('userName');
-    const referralLinkEl = document.getElementById('referralLink');
-    const copyBtn = document.getElementById('copyBtn');
-    const toastEl = document.getElementById('toast');
-    const logoutBtn = document.getElementById('logoutBtn');
+    const accountBalanceEl=document.getElementById('accountBalance');
+    const totalWithdrawnEl=document.getElementById('totalWithdrawn');
+    const totalEarningsEl=document.getElementById('totalEarnings');
+    const userNameEl=document.getElementById('userName');
+    const referralLinkEl=document.getElementById('referralLink');
+    const copyBtn=document.getElementById('copyBtn');
+    const toastEl=document.getElementById('toast');
+    const logoutBtn=document.getElementById('logoutBtn');
+    const earningsList=document.getElementById('earningsList');
+    const plansEl=document.getElementById('plans');
+    const referralsList=document.getElementById('referralsList');
 
-    auth.onAuthStateChanged(async (user)=>{
+  const plans = [
+  10000, 30000, 50000, 70000, 90000, 110000,
+  150000, 200000, 300000, 500000, 1000000
+];
+
+plans.forEach(a => {
+  const daily = a * 0.1;              // 10% daily income
+  const days = 120;                   // total investment duration
+  const total = daily * days;         // total earnings = daily × 120 days
+
+  plansEl.innerHTML += `
+    <tr>
+      <td>${a.toLocaleString()}</td>
+      <td>${daily.toLocaleString()}</td>
+      <td>${total.toLocaleString()}</td>
+      <td>${days}</td>
+    </tr>`;
+});
+
+    auth.onAuthStateChanged(async user=>{
       if(!user){window.location.href="login.html";return;}
-      const snap = await db.collection("users").doc(user.uid).get();
+      const snap=await db.collection("users").doc(user.uid).get();
       if(!snap.exists)return;
-      const data = snap.data();
-      userNameEl.textContent = data.name || "User";
+      const u=snap.data();
+      userNameEl.textContent=u.name||"User";
+      let balance=u.accountBalance||0, withdrawn=u.totalWithdrawn||0, totalEarn=u.totalEarnings||0;
 
-      accountBalanceEl.textContent = (data.accountBalance||0).toLocaleString()+" UGX";
-      totalWithdrawnEl.textContent = (data.totalWithdrawn||0).toLocaleString()+" UGX";
+      // --- Fetch active deposits ---
+      const depSnap=await db.collection("deposits").where("userId","==",user.uid).get();
+      if(depSnap.empty){
+        earningsList.innerHTML=`<tr><td colspan="4" class="muted">No active investments</td></tr>`;
+      }else{
+        earningsList.innerHTML="";
+        depSnap.forEach(doc=>{
+          const d=doc.data();
+          const invested=d.amount||0;
+          const remaining=d.remainingDays||120;
+          const earned=d.totalEarned||0;
+          const daily=invested*0.1;
 
-      // Use referral code saved in Firestore
-      const base = window.location.origin;
-      const myCode = data.myReferralCode || "REF"+Math.floor(Math.random()*10000);
-      referralLinkEl.textContent = `${base}/signup.html?ref=${myCode}`;
+          earningsList.innerHTML+=`
+            <tr>
+              <td>${invested.toLocaleString()}</td>
+              <td>${daily.toLocaleString()}</td>
+              <td>${remaining}</td>
+              <td>${earned.toLocaleString()}</td>
+            </tr>`;
+        });
+      }
+
+      accountBalanceEl.textContent=balance.toLocaleString()+" UGX";
+      totalWithdrawnEl.textContent=withdrawn.toLocaleString()+" UGX";
+      totalEarningsEl.textContent=totalEarn.toLocaleString()+" UGX";
+
+      // Referral link
+      const base=window.location.origin;
+      const myCode=u.myReferralCode||user.uid.slice(0,6);
+      referralLinkEl.textContent=`${base}/signup.html?ref=${myCode}`;
+
+      // --- Fetch referrals who invested ---
+      const refSnap=await db.collection("users").where("referrerPhone","==",u.phone).get();
+      if(refSnap.empty){
+        referralsList.innerHTML=`<tr><td colspan="3" class="muted">No referrals found</td></tr>`;
+      }else{
+        referralsList.innerHTML="";
+        refSnap.forEach(async r=>{
+          const rd=r.data();
+          const refName=rd.name||"User";
+          const refId=r.id;
+          const investSnap=await db.collection("deposits").where("userId","==",refId).orderBy("createdAt","asc").limit(1).get();
+          if(investSnap.empty)return;
+          const inv=investSnap.docs[0].data();
+          const amt=inv.amount||0;
+          const bonus=amt*0.1;
+          referralsList.innerHTML+=`<tr><td>${refName}</td><td>${amt.toLocaleString()}</td><td>${bonus.toLocaleString()}</td></tr>`;
+        });
+      }
     });
 
-    copyBtn.addEventListener("click", async()=>{
-      const text = referralLinkEl.textContent;
+    copyBtn.onclick=async()=>{
       try{
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(referralLinkEl.textContent);
         toastEl.classList.add("show");
         setTimeout(()=>toastEl.classList.remove("show"),2000);
-      }catch(e){alert("Copy failed. Copy manually.");}
-    });
-
-    logoutBtn.addEventListener("click", ()=>auth.signOut().then(()=>window.location.href="login.html"));
+      }catch{alert("Copy failed. Copy manually.");}
+    };
+    logoutBtn.onclick=()=>auth.signOut().then(()=>window.location.href="login.html");
   </script>
 </body>
 </html>
