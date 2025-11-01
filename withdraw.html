@@ -217,8 +217,8 @@
         return errorDiv.textContent = "Please fill in all fields.";
       }
 
-      if (amount < 5000) {
-        return errorDiv.textContent = "Minimum withdrawal is 5,000 UGX.";
+      if (amount < 3000) {
+        return errorDiv.textContent = "Minimum withdrawal is 3,000 UGX.";
       }
 
       const userRef = db.collection("users").doc(currentUser.uid);
