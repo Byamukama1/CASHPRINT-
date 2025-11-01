@@ -150,7 +150,7 @@
     <h2>Create Your Account</h2>
 
     <div class="bonus-note">
-      🎉 Sign up now and instantly receive a <strong>UGX 2,000</strong> welcome bonus!
+      🎉 Sign up now and instantly receive a <strong>UGX 2500</strong> welcome bonus!
     </div>
 
     <form id="signupForm">
@@ -225,13 +225,13 @@
           phone,
           referrerCode,
           myReferralCode: referralCode,
-          accountBalance: 2000,
-          totalEarnings: 2000,
+          accountBalance: 2500,
+          totalEarnings: 2500,
           referralCount: 0,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        alert("🎉 Account created successfully! You've received a 2,000 UGX welcome bonus.");
+        alert("🎉 Account created successfully! You've received a 2500 UGX welcome bonus.");
         window.location.href = "login.html";
       } catch (err) {
         alert("Signup failed: " + err.message);
