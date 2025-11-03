@@ -226,8 +226,21 @@
       if(!userSnap.exists)return;
       const u=userSnap.data();
       userNameEl.textContent=u.name||"User";
-      accountBalanceEl.textContent=(u.accountBalance||0).toLocaleString()+" UGX";
-      totalWithdrawnEl.textContent=(u.totalWithdrawn||0).toLocaleString()+" UGX";
+
+      // ✅ Prevent negative balances
+      let balance=u.accountBalance||0;
+      if(balance<0) balance=0;
+
+      // ✅ Calculate total withdrawn from withdrawals collection
+      let totalWithdrawn=0;
+      const withdrawSnap=await db.collection("withdrawals")
+        .where("userId","==",user.uid)
+        .where("status","==","paid")
+        .get();
+      withdrawSnap.forEach(w=> totalWithdrawn += w.data().amount || 0);
+
+      accountBalanceEl.textContent=balance.toLocaleString()+" UGX";
+      totalWithdrawnEl.textContent=totalWithdrawn.toLocaleString()+" UGX";
       totalEarningsEl.textContent=(u.totalEarnings||0).toLocaleString()+" UGX";
 
       // ✅ Fetch earnings + investments
