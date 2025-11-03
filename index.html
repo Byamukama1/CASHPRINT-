@@ -77,7 +77,6 @@
       transform:translateX(160%);transition:transform .25s ease;z-index:99;
     }
     .toast.show{transform:translateX(0);}
-
     .whatsapp-section{margin-top:16px;text-align:center;}
     .whatsapp-section h3{color:var(--primary-dark);margin-bottom:10px;}
     .whatsapp-link{
@@ -85,7 +84,6 @@
       background:#25D366;color:#fff;padding:10px;border-radius:8px;
       text-decoration:none;font-weight:700;
     }
-
     .referrals-section{margin-top:18px;}
     .referrals-section table{margin-top:10px;}
   </style>
@@ -120,16 +118,16 @@
       </div>
     </div>
 
-   <!-- Quick Actions -->
-<div class="actions">
-  <button onclick="window.location.href='deposit.html'" class="action deposit">
-    <i class="fa-solid fa-plus-circle"></i> Deposit
-  </button>
+    <!-- Quick Actions -->
+    <div class="actions">
+      <button onclick="window.location.href='deposit.html'" class="action deposit">
+        <i class="fa-solid fa-plus-circle"></i> Deposit
+      </button>
+      <button onclick="window.location.href='withdraw.html'" class="action withdraw">
+        <i class="fa-solid fa-hand-holding-dollar"></i> Withdraw
+      </button>
+    </div>
 
-  <button onclick="window.location.href='withdraw.html'" class="action withdraw">
-    <i class="fa-solid fa-hand-holding-dollar"></i> Withdraw
-  </button>
-</div>
     <!-- Active Earnings -->
     <section class="panel">
       <h2 class="section-title"><i class="fa-solid fa-money-bill-wave"></i> Your Active Investments</h2>
@@ -151,19 +149,14 @@
       <div class="whatsapp-section">
         <h3>📱 Join Our WhatsApp Groups</h3>
         <a href="https://chat.whatsapp.com/JCuAGHej7pHDi8bCK0Hy4p?mode=wwc" class="whatsapp-link">Join Group One</a>
-      
       </div>
 
-      <!-- Referrals who invested -->
+      <!-- Referrals -->
       <div class="referrals-section">
         <h3 class="section-title"><i class="fa-solid fa-users"></i> Your Referrals Who Invested</h3>
         <table>
           <thead>
-            <tr>
-              <th>Name</th>
-              <th>First Investment (UGX)</th>
-              <th>Your Bonus (10%)</th>
-            </tr>
+            <tr><th>Name</th><th>First Investment (UGX)</th><th>Your Bonus (10%)</th></tr>
           </thead>
           <tbody id="referralsList">
             <tr><td colspan="3" class="muted">Loading referrals…</td></tr>
@@ -186,9 +179,7 @@
     <section class="panel">
       <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Investment Plans</h2>
       <table>
-        <thead>
-          <tr><th>Amount (UGX)</th><th>Daily Income (10%)</th><th>Total Earnings</th><th>Days</th></tr>
-        </thead>
+        <thead><tr><th>Amount (UGX)</th><th>Daily Income (10%)</th><th>Total Earnings</th><th>Days</th></tr></thead>
         <tbody id="plans"></tbody>
       </table>
     </section>
@@ -222,78 +213,65 @@
     const plansEl=document.getElementById('plans');
     const referralsList=document.getElementById('referralsList');
 
-  const plans = [
-  10000, 30000, 50000, 70000, 90000, 110000,
-  150000, 200000, 300000, 500000, 1000000
-];
-
-plans.forEach(a => {
-  const daily = a * 0.1;              // 10% daily income
-  const days = 120;                   // total investment duration
-  const total = daily * days;         // total earnings = daily × 120 days
-
-  plansEl.innerHTML += `
-    <tr>
-      <td>${a.toLocaleString()}</td>
-      <td>${daily.toLocaleString()}</td>
-      <td>${total.toLocaleString()}</td>
-      <td>${days}</td>
-    </tr>`;
-});
+    // Investment Plans
+    const plans=[10000,30000,50000,70000,90000,110000,150000,200000,300000,500000,1000000];
+    plans.forEach(a=>{
+      const daily=a*0.1; const days=120; const total=daily*days;
+      plansEl.innerHTML+=`<tr><td>${a.toLocaleString()}</td><td>${daily.toLocaleString()}</td><td>${total.toLocaleString()}</td><td>${days}</td></tr>`;
+    });
 
     auth.onAuthStateChanged(async user=>{
       if(!user){window.location.href="login.html";return;}
-      const snap=await db.collection("users").doc(user.uid).get();
-      if(!snap.exists)return;
-      const u=snap.data();
+      const userSnap=await db.collection("users").doc(user.uid).get();
+      if(!userSnap.exists)return;
+      const u=userSnap.data();
       userNameEl.textContent=u.name||"User";
-      let balance=u.accountBalance||0, withdrawn=u.totalWithdrawn||0, totalEarn=u.totalEarnings||0;
+      accountBalanceEl.textContent=(u.accountBalance||0).toLocaleString()+" UGX";
+      totalWithdrawnEl.textContent=(u.totalWithdrawn||0).toLocaleString()+" UGX";
+      totalEarningsEl.textContent=(u.totalEarnings||0).toLocaleString()+" UGX";
 
-      // --- Fetch active deposits ---
-      const depSnap=await db.collection("deposits").where("userId","==",user.uid).get();
-      if(depSnap.empty){
-        earningsList.innerHTML=`<tr><td colspan="4" class="muted">No active investments</td></tr>`;
+      // ✅ Fetch earnings + investments
+      const [earnSnap, investSnap] = await Promise.all([
+        db.collection("earnings").where("userId","==",user.uid).get(),
+        db.collection("investments").where("userId","==",user.uid).get()
+      ]);
+
+      const allRecords=[...earnSnap.docs,...investSnap.docs];
+      if(allRecords.length===0){
+        earningsList.innerHTML=`<tr><td colspan="4" class="muted">No active investments found</td></tr>`;
       }else{
         earningsList.innerHTML="";
-        depSnap.forEach(doc=>{
-          const d=doc.data();
-          const invested=d.amount||0;
-          const remaining=d.remainingDays||120;
-          const earned=d.totalEarned||0;
-          const daily=invested*0.1;
-
+        allRecords.forEach(doc=>{
+          const e=doc.data();
+          const totalEarned=e.totalEarnedSoFar||e.totalEarned||0;
           earningsList.innerHTML+=`
             <tr>
-              <td>${invested.toLocaleString()}</td>
-              <td>${daily.toLocaleString()}</td>
-              <td>${remaining}</td>
-              <td>${earned.toLocaleString()}</td>
+              <td>${(e.amount||0).toLocaleString()}</td>
+              <td>${(e.dailyIncome||0).toLocaleString()}</td>
+              <td>${(e.remainingDays||0)}</td>
+              <td>${totalEarned.toLocaleString()}</td>
             </tr>`;
         });
       }
 
-      accountBalanceEl.textContent=balance.toLocaleString()+" UGX";
-      totalWithdrawnEl.textContent=withdrawn.toLocaleString()+" UGX";
-      totalEarningsEl.textContent=totalEarn.toLocaleString()+" UGX";
-
       // Referral link
       const base=window.location.origin;
-      const myCode=u.myReferralCode||user.uid.slice(0,6);
-      referralLinkEl.textContent=`${base}/signup.html?ref=${myCode}`;
+      const code=u.myReferralCode||user.uid.slice(0,6);
+      referralLinkEl.textContent=`${base}/signup.html?ref=${code}`;
 
-      // --- Fetch referrals who invested ---
+      // Referrals who invested
       const refSnap=await db.collection("users").where("referrerPhone","==",u.phone).get();
       if(refSnap.empty){
-        referralsList.innerHTML=`<tr><td colspan="3" class="muted">No referrals found</td></tr>`;
+        referralsList.innerHTML=`<tr><td colspan="3" class="muted">No referrals yet</td></tr>`;
       }else{
         referralsList.innerHTML="";
         refSnap.forEach(async r=>{
           const rd=r.data();
           const refName=rd.name||"User";
           const refId=r.id;
-          const investSnap=await db.collection("deposits").where("userId","==",refId).orderBy("createdAt","asc").limit(1).get();
-          if(investSnap.empty)return;
-          const inv=investSnap.docs[0].data();
+          const invSnap=await db.collection("investments").where("userId","==",refId).limit(1).get();
+          if(invSnap.empty)return;
+          const inv=invSnap.docs[0].data();
           const amt=inv.amount||0;
           const bonus=amt*0.1;
           referralsList.innerHTML+=`<tr><td>${refName}</td><td>${amt.toLocaleString()}</td><td>${bonus.toLocaleString()}</td></tr>`;
