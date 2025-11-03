@@ -243,7 +243,7 @@
       totalWithdrawnEl.textContent=totalWithdrawn.toLocaleString()+" UGX";
       totalEarningsEl.textContent=(u.totalEarnings||0).toLocaleString()+" UGX";
 
-      // ✅ Fetch earnings + investments
+      // ✅ Fetch only existing earnings + investments — no creation here
       const [earnSnap, investSnap] = await Promise.all([
         db.collection("earnings").where("userId","==",user.uid).get(),
         db.collection("investments").where("userId","==",user.uid).get()
