@@ -243,30 +243,30 @@
       totalWithdrawnEl.textContent=totalWithdrawn.toLocaleString()+" UGX";
       totalEarningsEl.textContent=(u.totalEarnings||0).toLocaleString()+" UGX";
 
-      // ✅ Fetch only existing earnings + investments — no creation here
-      const [earnSnap, investSnap] = await Promise.all([
-        db.collection("earnings").where("userId","==",user.uid).get(),
-        db.collection("investments").where("userId","==",user.uid).get()
-      ]);
+    
 
-      const allRecords=[...earnSnap.docs,...investSnap.docs];
-      if(allRecords.length===0){
-        earningsList.innerHTML=`<tr><td colspan="4" class="muted">No active investments found</td></tr>`;
-      }else{
-        earningsList.innerHTML="";
-        allRecords.forEach(doc=>{
-          const e=doc.data();
-          const totalEarned=e.totalEarnedSoFar||e.totalEarned||0;
-          earningsList.innerHTML+=`
-            <tr>
-              <td>${(e.amount||0).toLocaleString()}</td>
-              <td>${(e.dailyIncome||0).toLocaleString()}</td>
-              <td>${(e.remainingDays||0)}</td>
-              <td>${totalEarned.toLocaleString()}</td>
-            </tr>`;
-        });
-      }
+// ✅ Fetch only earnings (avoid duplication from investments)
+const earnSnap = await db.collection("earnings")
+  .where("userId", "==", user.uid)
+  .get();
 
+if (earnSnap.empty) {
+  earningsList.innerHTML = `
+    <tr><td colspan="4" class="muted">No active investments found</td></tr>`;
+} else {
+  earningsList.innerHTML = "";
+  earnSnap.forEach(doc => {
+    const e = doc.data();
+    const totalEarned = e.totalEarnedSoFar || e.totalEarned || 0;
+    earningsList.innerHTML += `
+      <tr>
+        <td>${(e.amount || 0).toLocaleString()}</td>
+        <td>${(e.dailyIncome || 0).toLocaleString()}</td>
+        <td>${(e.remainingDays || 0)}</td>
+        <td>${totalEarned.toLocaleString()}</td>
+      </tr>`;
+  });
+}
       // Referral link
       const base=window.location.origin;
       const code=u.myReferralCode||user.uid.slice(0,6);
