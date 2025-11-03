@@ -229,7 +229,17 @@
         return errorDiv.textContent = "Insufficient account balance.";
       }
 
-      // Check deposit eligibility without index
+      // Check for existing pending withdrawal
+      const pendingSnap = await db.collection("withdrawals")
+        .where("userId", "==", currentUser.uid)
+        .where("status", "==", "pending")
+        .get();
+
+      if (!pendingSnap.empty) {
+        return errorDiv.textContent = "You already have a pending withdrawal. Please wait for it to be processed.";
+      }
+
+      // Check deposit eligibility
       const depositsSnap = await db.collection("deposits")
         .where("userId", "==", currentUser.uid)
         .where("status", "==", "approved")
@@ -254,10 +264,6 @@
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        await userRef.update({
-          accountBalance: firebase.firestore.FieldValue.increment(-amount)
-        });
-
         alert("✅ Withdrawal request submitted successfully.");
         document.getElementById("withdrawForm").reset();
         await loadUserBalance();
@@ -270,7 +276,7 @@
       const container = document.getElementById("withdrawalsContainer");
       const snapshot = await db.collection("withdrawals")
         .where("status", "==", "paid")
-        .get(); // random/default order - no index
+        .get();
 
       if (snapshot.empty) {
         container.innerHTML = "<p style='text-align:center;color:#666;'>No paid withdrawals yet.</p>";
